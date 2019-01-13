@@ -97,7 +97,7 @@
 
 
   <meta name="description" content="Git版本控制的时候，有很多非代码文件也会被跟踪，比较常见的如一些影藏文件DS_Store、以xcworkspace、xcuserstate、xcuserdata等结尾的状态文件等。为了不把这些文件加入版本控制体系中，我们需要进行以下三步设置，注意，每一步必不可少，也不可交换位置，下文会具体解释原因。   第一步：进入git的代码仓库，执行以下的代码  12git rm --cached *.x">
-<meta name="keywords" content="Xcode,IOS">
+<meta name="keywords" content="IOS,Xcode">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Xcode git 忽略无关文件">
 <meta property="og:url" content="http://kuiyu.top/2017/06/22/Xcode-git-忽略无关文件/index.html">
@@ -519,9 +519,9 @@
       
         <div class="post-tags">
           
-            <a href="/tags/Xcode/" rel="tag"># Xcode</a>
-          
             <a href="/tags/IOS/" rel="tag"># IOS</a>
+          
+            <a href="/tags/Xcode/" rel="tag"># Xcode</a>
           
         </div>
       
@@ -544,8 +544,8 @@
 
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/2018/01/11/runtime/" rel="prev" title="设计模式">
-                设计模式 <i class="fa fa-chevron-right"></i>
+              <a href="/2017/11/13/消息传递/" rel="prev" title="消息传递">
+                消息传递 <i class="fa fa-chevron-right"></i>
               </a>
             
           </div>
@@ -607,7 +607,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">16</span>
+                    <span class="site-state-item-count">18</span>
                     <span class="site-state-item-name">日志</span>
                   </a>
                 </div>
@@ -640,7 +640,9 @@
                     
                       
                     
-                    <span class="site-state-item-count">10</span>
+                      
+                    
+                    <span class="site-state-item-count">11</span>
                     <span class="site-state-item-name">分类</span>
                   </a>
                 </div>
@@ -736,10 +738,10 @@
 
 
 
-  <script src="https://unpkg.com/mermaid@<%= theme.mermaid.version %>/dist/mermaid.min.js"></script>
+  <script src="https://unpkg.com/mermaid@7.1.2/dist/mermaid.min.js"></script>
   <script>
     if (window.mermaid) {
-      mermaid.initialize({theme: 'forest'});
+      mermaid.initialize("");
     }
   </script>
 

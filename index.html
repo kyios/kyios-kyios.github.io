@@ -917,6 +917,228 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://kuiyu.top/2018/11/13/RunTime-相关结构体/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="智奎宇">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="kieran">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                
+                <a href="/2018/11/13/RunTime-相关结构体/" class="post-title-link" itemprop="url">RunTime 相关结构体</a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2018-11-13 18:21:29" itemprop="dateCreated datePublished" datetime="2018-11-13T18:21:29+08:00">2018-11-13</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-01-13 20:56:53" itemprop="dateModified" datetime="2019-01-13T20:56:53+08:00">2019-01-13</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing"><a href="/categories/Runtime/" itemprop="url" rel="index"><span itemprop="name">Runtime</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="RunTime-相关结构体"><a href="#RunTime-相关结构体" class="headerlink" title="RunTime 相关结构体"></a>RunTime 相关结构体</h1><p><strong>Runtime 功能介绍</strong></p>
+<p><img src="https://kuiyu-1258489344.cos.ap-chengdu.myqcloud.com/RunTime-%E7%9B%B8%E5%85%B3%E7%BB%93%E6%9E%84%E4%BD%93/runtime_map.png" alt=""></p>
+<h2 id="objc-object"><a href="#objc-object" class="headerlink" title="objc_object"></a><code>objc_object</code></h2><p><img src="https://kuiyu-1258489344.cos.ap-chengdu.myqcloud.com/RunTime-%E7%9B%B8%E5%85%B3%E7%BB%93%E6%9E%84%E4%BD%93/objc_object_map.png" alt=""></p>
+<h2 id="objc-class"><a href="#objc-class" class="headerlink" title="objc_class"></a><code>objc_class</code></h2><p><img src="https://kuiyu-1258489344.cos.ap-chengdu.myqcloud.com/RunTime-%E7%9B%B8%E5%85%B3%E7%BB%93%E6%9E%84%E4%BD%93/objc_class_map.png" alt=""></p>
+<p><code>Class</code> 描述</p>
+<ul>
+<li><code>objc_class</code> 的结构体</li>
+<li>类对象(继承自<code>objc_object</code>)</li>
+</ul>
+<p><code>superClass</code> 指向<code>Class</code>,如果类对象指向父类。<br><code>cache</code> 代表方法缓存。<br><code>bits</code> 包含该类变量、属性、方法</p>
+<h2 id="isa-t"><a href="#isa-t" class="headerlink" title="isa_t"></a><code>isa_t</code></h2><blockquote>
+<p>C++ 中的共用体,在32（64）位是32（64）个 0 或者1数字</p>
+</blockquote>
+<p><img src="https://kuiyu-1258489344.cos.ap-chengdu.myqcloud.com/RunTime-%E7%9B%B8%E5%85%B3%E7%BB%93%E6%9E%84%E4%BD%93/isa_ma.png" alt=""></p>
+<p>分成指针型和非指针型的目的是，实际只有30-40位就可以寻找到 <code>class</code>地址，多出来的部分其他的内容，达到节省内存的目的</p>
+<p><strong>指向</strong></p>
+<ul>
+<li><strong>对象</strong>，指向 <strong>类对象</strong></li>
+<li><strong>类对象</strong>，指向 <strong>元类对象（MetaClass）</strong></li>
+</ul>
+<blockquote>
+<p>方法查找：<br>对象的方法通过对象所对应的类对象进行方法查找<br>类对象方法通过所对应元类对象进行方法查找</p>
+</blockquote>
+<h2 id="cache-t"><a href="#cache-t" class="headerlink" title="cache_t"></a><code>cache_t</code></h2><p><strong>用于快速查找方法执行函数</strong>提高方法调用的速度，和传递的书读<br><strong>是可以增量扩展的哈希表结构</strong><br><strong>是局部性原理最佳应用</strong></p>
+<p>局部性原理：把调用率方法放入缓存中，下次调用的命中率会高一些</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">struct cache_t &#123;</span><br><span class="line">    struct bucket_t *_buckets;</span><br><span class="line">    mask_t _mask;</span><br><span class="line">    mask_t _occupied;</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">struct bucket_t &#123;</span><br><span class="line">private:</span><br><span class="line">    cache_key_t _key;</span><br><span class="line">    IMP _imp;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<h2 id="class-data-bits-t"><a href="#class-data-bits-t" class="headerlink" title="class_data_bits_t"></a><code>class_data_bits_t</code></h2><ul>
+<li><code>class_data_bits_t</code> 主要对 <code>class_rw_t</code>的封装</li>
+<li><code>class_rw_t</code>代表了类相关的<strong>读写</strong>信息、对<code>class_ro_t</code>的封装</li>
+<li><code>class_ro_t</code> 代表了类的<strong>只读</strong>信息<h3 id="class-rw-t"><a href="#class-rw-t" class="headerlink" title="class_rw_t"></a><code>class_rw_t</code></h3><img src="https://kuiyu-1258489344.cos.ap-chengdu.myqcloud.com/RunTime-%E7%9B%B8%E5%85%B3%E7%BB%93%E6%9E%84%E4%BD%93/class_rw_t.png" alt=""><br><code>class_rw_t</code> 包含类及其分类中的协议、属性、方法</li>
+</ul>
+<h3 id="class-ro-t"><a href="#class-ro-t" class="headerlink" title="class_ro_t"></a><code>class_ro_t</code></h3><p><img src="https://kuiyu-1258489344.cos.ap-chengdu.myqcloud.com/RunTime-%E7%9B%B8%E5%85%B3%E7%BB%93%E6%9E%84%E4%BD%93/class_ro_t.png" alt=""></p>
+<ul>
+<li><code>name</code> 类名</li>
+<li><code>ivars</code> 声明或定义的类的成员变量</li>
+<li><code>properties</code> 类的属性</li>
+<li><code>protocols</code> 写的遵从的协议</li>
+<li><code>methodList</code> 方法列表</li>
+</ul>
+<p><code>class_ro_t</code> 包含该类中的协议、属性、方法。</p>
+<h3 id="method-t"><a href="#method-t" class="headerlink" title="method_t"></a><code>method_t</code></h3><p><img src="https://kuiyu-1258489344.cos.ap-chengdu.myqcloud.com/RunTime-%E7%9B%B8%E5%85%B3%E7%BB%93%E6%9E%84%E4%BD%93/method_t.png" alt=""><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">struct method_t &#123;</span><br><span class="line">    SEL name;</span><br><span class="line">    const char *types;</span><br><span class="line">    IMP imp;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
+<ul>
+<li><code>name</code> 方法名称</li>
+<li><code>types</code> 方法的返回值和参数的组合</li>
+<li><code>imp</code> 无类型的函数指针，指向的是函数体</li>
+</ul>
+<h4 id="Type-Encodings-method-t-gt-types"><a href="#Type-Encodings-method-t-gt-types" class="headerlink" title="Type Encodings method_t-&gt;types"></a>Type Encodings <code>method_t</code>-&gt;<code>types</code></h4><p><img src="https://kuiyu-1258489344.cos.ap-chengdu.myqcloud.com/RunTime-%E7%9B%B8%E5%85%B3%E7%BB%93%E6%9E%84%E4%BD%93/type%20Encodings.png" alt=""></p>
+<p><img src="https://kuiyu-1258489344.cos.ap-chengdu.myqcloud.com/RunTime-%E7%9B%B8%E5%85%B3%E7%BB%93%E6%9E%84%E4%BD%93/testmethod.png" alt=""></p>
+<p><img src="/RunTime-相关结构体/20190113085645545.png" alt=""></p>
+<p><img src="/RunTime-相关结构体/20190113085628224.png" alt=""></p>
+
+          
+        
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://kuiyu.top/2018/10/12/IOS-UI-总结/">
 
     <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
@@ -979,7 +1201,7 @@
                 
                   <span class="post-meta-item-text">更新于</span>
                 
-                <time title="修改时间：2019-01-12 21:05:04" itemprop="dateModified" datetime="2019-01-12T21:05:04+08:00">2019-01-12</time>
+                <time title="修改时间：2019-01-13 18:38:07" itemprop="dateModified" datetime="2019-01-13T18:38:07+08:00">2019-01-13</time>
               
             
           </span>
@@ -1959,7 +2181,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://kuiyu.top/2017/06/22/Xcode-git-忽略无关文件/">
+    <link itemprop="mainEntityOfPage" href="http://kuiyu.top/2017/11/13/消息传递/">
 
     <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
       <meta itemprop="name" content="智奎宇">
@@ -1979,7 +2201,7 @@
           <h1 class="post-title" itemprop="name headline">
                 
                 
-                <a href="/2017/06/22/Xcode-git-忽略无关文件/" class="post-title-link" itemprop="url">Xcode git 忽略无关文件</a>
+                <a href="/2017/11/13/消息传递/" class="post-title-link" itemprop="url">消息传递</a>
               
             
           </h1>
@@ -2004,190 +2226,7 @@
                 
               
 
-              <time title="创建时间：2017-06-22 17:37:00 / 修改时间：20:47:52" itemprop="dateCreated datePublished" datetime="2017-06-22T17:37:00+08:00">2017-06-22</time>
-            
-
-            
-              
-
-              
-            
-          </span>
-
-          
-            <span class="post-category">
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing"><a href="/categories/Git/" itemprop="url" rel="index"><span itemprop="name">Git</span></a></span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p> Git<strong>版本控制</strong>的时候，有很多非代码文件也会被跟踪，比较常见的如一些影藏文件DS_Store、以xcworkspace、xcuserstate、xcuserdata等结尾的状态文件等。为了不把这些文件加入版本控制体系中，我们需要进行以下三步设置，注意，每一步必不可少，也不可交换位置，下文会具体解释原因。 </p>
-<ol>
-<li>第一步：进入git的代码仓库，执行以下的代码</li>
-</ol>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">git rm --cached *.xcuserstate</span><br><span class="line">git rm --cached *.xcuserdata</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>这两行代码（或者可以有更多，自己修改后缀名即可，这里列出了常见的两种隐藏文件）表示不再追踪以这些后缀结尾的文件，注意这里的文件在执行代码前其实已经被追踪（Tracked），执行完后，将不再被追踪。</p>
-</blockquote>
-<ol start="2">
-<li>修改.gitignore文件</li>
-</ol>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">vim .gitignore</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>这时候会进入gitignore的文件的编辑界面，如果这个文件已经存在，则可以通过普通的文本编辑器直接进行修改（需要设置显示隐藏文件），复制以下内容进入.gitignore文件。（ignore.io推荐）</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">build/</span><br><span class="line">*.pbxuser</span><br><span class="line">!default.pbxuser</span><br><span class="line">*.mode1v3</span><br><span class="line">!default.mode1v3</span><br><span class="line">*.mode2v3</span><br><span class="line">!default.mode2v3</span><br><span class="line">*.perspectivev3</span><br><span class="line">!default.perspectivev3</span><br><span class="line">xcuserdata</span><br><span class="line">*.xccheckout</span><br><span class="line">*.moved-aside</span><br><span class="line">DerivedData</span><br><span class="line">*.xcuserstate</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>按esc键退出编辑，输入：wq保存文件。<br>注意这里的gitignore文件的修改，仅对未追踪（Untracked）的文件生效，所以首先要执行第一步，取消对以上类型文件的追踪。</p>
-</blockquote>
-<ol start="3">
-<li>第三步：提交此处版本修改<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">git add .</span><br><span class="line">git commit -m &quot;igonre files &quot;</span><br><span class="line">git push origin master</span><br></pre></td></tr></table></figure>
-</li>
-</ol>
-<p><strong>重启Xcode并且尝试修改一个文件后执行commit，发现那些与代码无关的文件并不会被自动提交了</strong></p>
-
-          
-        
-      
-    </div>
-
-    
-
-    
-    
-    
-
-    
-
-    
-      
-    
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  
-
-  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://kuiyu.top/2017/06/22/Android-四大组件之SharedPrefernces/">
-
-    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="智奎宇">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="kieran">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                
-                <a href="/2017/06/22/Android-四大组件之SharedPrefernces/" class="post-title-link" itemprop="url">android:数据存储SharedPrefernces</a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-
-            
-            
-            
-
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-
-              
-                
-              
-
-              <time title="创建时间：2017-06-22 16:51:00" itemprop="dateCreated datePublished" datetime="2017-06-22T16:51:00+08:00">2017-06-22</time>
+              <time title="创建时间：2017-11-13 21:21:35" itemprop="dateCreated datePublished" datetime="2017-11-13T21:21:35+08:00">2017-11-13</time>
             
 
             
@@ -2204,7 +2243,7 @@
                 
                   <span class="post-meta-item-text">更新于</span>
                 
-                <time title="修改时间：2019-01-05 11:38:56" itemprop="dateModified" datetime="2019-01-05T11:38:56+08:00">2019-01-05</time>
+                <time title="修改时间：2019-01-13 22:16:06" itemprop="dateModified" datetime="2019-01-13T22:16:06+08:00">2019-01-13</time>
               
             
           </span>
@@ -2221,7 +2260,7 @@
                 <span class="post-meta-item-text">分类于</span>
               
               
-                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing"><a href="/categories/android/" itemprop="url" rel="index"><span itemprop="name">android</span></a></span>
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing"><a href="/categories/消息传递/" itemprop="url" rel="index"><span itemprop="name">消息传递</span></a></span>
 
                 
                 
@@ -2256,16 +2295,29 @@
 
       
         
-          <h1 id="Android-四大组件之使用SharedPrefernces"><a href="#Android-四大组件之使用SharedPrefernces" class="headerlink" title="Android 四大组件之使用SharedPrefernces"></a>Android 四大组件之使用SharedPrefernces</h1><h2 id="SharedPreferences到底是什么"><a href="#SharedPreferences到底是什么" class="headerlink" title="SharedPreferences到底是什么"></a>SharedPreferences到底是什么</h2><p>它是一个轻量级的存储类，特别适合用于保存软件配置参数。使用SharedPreferences保存数据，其背后是用xml文件存放数据，文件存放在/data/data/packagename/shared_prefs目录下：</p>
-          <!--noindex-->
           
-            <div class="post-button text-center">
-              <a class="btn" href="/2017/06/22/Android-四大组件之SharedPrefernces/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
+            <h1 id="消息传递"><a href="#消息传递" class="headerlink" title="消息传递"></a>消息传递</h1><p><img src="https://kuiyu-1258489344.cos.ap-chengdu.myqcloud.com/%E6%B6%88%E6%81%AF%E4%BC%A0%E9%80%92/messagesend.png" alt=""></p>
+<h2 id="缓存查找"><a href="#缓存查找" class="headerlink" title="缓存查找"></a>缓存查找</h2><p>给定 目标 <code>SEL</code>,获取目标对应的 <code>bucket_t</code> 中的<code>IMP</code></p>
+<pre class="mermaid">graph TD
+A[obj testmethod] 
+
+A-->C[cache_key_t key = getKey:sel]
+C-->D[cache->find: key, receiver]</pre>
+
+<p>缓存调用栈<br><img src="https://kuiyu-1258489344.cos.ap-chengdu.myqcloud.com/%E6%B6%88%E6%81%AF%E4%BC%A0%E9%80%92/methostate.png" alt=""></p>
+<p>一、 <code>[obj testmethod]</code> 调用<br>二、 获取方法选择器对应的KEY</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">cache_key_t getKey(SEL sel) </span><br><span class="line">&#123;</span><br><span class="line">    assert(sel);</span><br><span class="line">    return (cache_key_t)sel;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>三、获取<code>bucket_t</code> 中<code>SEL</code>对应的key<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">static void cache_fill_nolock(Class cls, SEL sel, IMP imp, id receiver)</span><br><span class="line">&#123;</span><br><span class="line">    ///略。。。</span><br><span class="line">    cache_key_t key = getKey(sel);</span><br><span class="line"></span><br><span class="line">    ///略。。。</span><br><span class="line">    bucket_t *bucket = cache-&gt;find(key, receiver);</span><br><span class="line">    if (bucket-&gt;key() == 0) cache-&gt;incrementOccupied();</span><br><span class="line">    bucket-&gt;set(key, imp);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p><strong> <code>cache-&gt;find(key, receiver);</code></strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">bucket_t * cache_t::find(cache_key_t k, id receiver)</span><br><span class="line">&#123;</span><br><span class="line">    assert(k != 0);</span><br><span class="line">    bucket_t *b = buckets();</span><br><span class="line">    mask_t m = mask();</span><br><span class="line">    mask_t begin = cache_hash(k, m);</span><br><span class="line">    mask_t i = begin;</span><br><span class="line">    do &#123;</span><br><span class="line">        if (b[i].key() == 0  ||  b[i].key() == k) &#123;</span><br><span class="line">            return &amp;b[i];</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; while ((i = cache_next(i, m)) != begin);</span><br><span class="line"></span><br><span class="line">    // hack</span><br><span class="line">    Class cls = (Class)((uintptr_t)this - offsetof(objc_class, cache));</span><br><span class="line">    cache_t::bad_cache(receiver, (SEL)k, cls);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>bucket_t 对应的KEY 实际是经过HASH 算法得到</p>
+<p>四、通过 <code>bucket_t</code> 获取<code>IMP</code> 调用方法</p>
+<h2 id="当前类中查找"><a href="#当前类中查找" class="headerlink" title="当前类中查找"></a>当前类中查找</h2><ul>
+<li>对于 <strong>已排序好</strong>列表，采用 <strong>二分查找</strong>算法查找方法</li>
+<li>对弈 <strong>没有排序</strong>列表，采用 <strong>一般遍历</strong>查找对应方法</li>
+</ul>
+<h2 id="父类逐级查找"><a href="#父类逐级查找" class="headerlink" title="父类逐级查找"></a>父类逐级查找</h2><p><img src="https://kuiyu-1258489344.cos.ap-chengdu.myqcloud.com/%E6%B6%88%E6%81%AF%E4%BC%A0%E9%80%92/zhujichazhao.png" alt=""></p>
+
           
-          <!--/noindex-->
         
       
     </div>
@@ -2352,7 +2404,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">16</span>
+                    <span class="site-state-item-count">18</span>
                     <span class="site-state-item-name">日志</span>
                   </a>
                 </div>
@@ -2385,7 +2437,9 @@
                     
                       
                     
-                    <span class="site-state-item-count">10</span>
+                      
+                    
+                    <span class="site-state-item-count">11</span>
                     <span class="site-state-item-name">分类</span>
                   </a>
                 </div>
@@ -2481,10 +2535,10 @@
 
 
 
-  <script src="https://unpkg.com/mermaid@<%= theme.mermaid.version %>/dist/mermaid.min.js"></script>
+  <script src="https://unpkg.com/mermaid@7.1.2/dist/mermaid.min.js"></script>
   <script>
     if (window.mermaid) {
-      mermaid.initialize({theme: 'forest'});
+      mermaid.initialize("");
     }
   </script>
 
