@@ -1,0 +1,1365 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=6.7.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.7.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.7.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.7.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.7.0" color="#222">
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '6.7.0',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="UI 视图屏幕的显示原理CRT 的电子枪按照屏幕最上方，从左到右，一行行的进行扫描。显示器会用硬件时钟产生的一系列信号，把显示器的显示过程和系统的显示控制器同步。CRT换到下一行的时候，准备扫描的时候，显示器会发出一个水平同步信号horizonal synchronization），简称 HSync。 当一帧全部扫描完成后，CRT回复到初始状态时候，会发出一个垂直同步信号（vertical syn">
+<meta name="keywords" content="IOS">
+<meta property="og:type" content="article">
+<meta property="og:title" content="IOS UI 总结">
+<meta property="og:url" content="http://kuiyu.top/2018/10/12/IOS-UI-总结/index.html">
+<meta property="og:site_name" content="kieran">
+<meta property="og:description" content="UI 视图屏幕的显示原理CRT 的电子枪按照屏幕最上方，从左到右，一行行的进行扫描。显示器会用硬件时钟产生的一系列信号，把显示器的显示过程和系统的显示控制器同步。CRT换到下一行的时候，准备扫描的时候，显示器会发出一个水平同步信号horizonal synchronization），简称 HSync。 当一帧全部扫描完成后，CRT回复到初始状态时候，会发出一个垂直同步信号（vertical syn">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://kuiyu-1258489344.cos.ap-chengdu.myqcloud.com/IOS-UI-%E6%80%BB%E7%BB%93/zongxian.png">
+<meta property="og:image" content="https://kuiyu-1258489344.cos.ap-chengdu.myqcloud.com/IOS-UI-%E6%80%BB%E7%BB%93/draw.png">
+<meta property="og:updated_time" content="2019-01-12T13:05:04.129Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="IOS UI 总结">
+<meta name="twitter:description" content="UI 视图屏幕的显示原理CRT 的电子枪按照屏幕最上方，从左到右，一行行的进行扫描。显示器会用硬件时钟产生的一系列信号，把显示器的显示过程和系统的显示控制器同步。CRT换到下一行的时候，准备扫描的时候，显示器会发出一个水平同步信号horizonal synchronization），简称 HSync。 当一帧全部扫描完成后，CRT回复到初始状态时候，会发出一个垂直同步信号（vertical syn">
+<meta name="twitter:image" content="https://kuiyu-1258489344.cos.ap-chengdu.myqcloud.com/IOS-UI-%E6%80%BB%E7%BB%93/zongxian.png">
+
+
+
+
+
+
+  <link rel="canonical" href="http://kuiyu.top/2018/10/12/IOS-UI-总结/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>IOS UI 总结 | kieran</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">kieran</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <p class="site-subtitle">开发</p>
+      
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+
+      
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://kuiyu.top/2018/10/12/IOS-UI-总结/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="智奎宇">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="kieran">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">IOS UI 总结
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2018-10-12 20:51:02" itemprop="dateCreated datePublished" datetime="2018-10-12T20:51:02+08:00">2018-10-12</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-01-12 21:05:04" itemprop="dateModified" datetime="2019-01-12T21:05:04+08:00">2019-01-12</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing"><a href="/categories/UI/" itemprop="url" rel="index"><span itemprop="name">UI</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="UI-视图"><a href="#UI-视图" class="headerlink" title="UI 视图"></a>UI 视图</h1><h2 id="屏幕的显示原理"><a href="#屏幕的显示原理" class="headerlink" title="屏幕的显示原理"></a>屏幕的显示原理</h2><p>CRT 的电子枪按照屏幕最上方，从左到右，一行行的进行扫描。<br>显示器会用硬件时钟产生的一系列信号，把显示器的显示过程和系统的显示控制器同步。<br>CRT换到下一行的时候，准备扫描的时候，显示器会发出一个水平同步信号horizonal synchronization），简称 HSync。</p>
+<p>当一帧全部扫描完成后，CRT回复到初始状态时候，会发出一个垂直同步信号（vertical synchronization）简称VSync, 显示器通常会一VSync的频率进行刷新</p>
+<p><img src="https://kuiyu-1258489344.cos.ap-chengdu.myqcloud.com/IOS-UI-%E6%80%BB%E7%BB%93/zongxian.png" alt=""></p>
+<p>通常来说CPU 和GPU 是一上面的方式协同工作。</p>
+<ul>
+<li>CPU 计算好显示内容，提交给GPU</li>
+<li>GPU 渲染完成后将结果放入缓存区</li>
+<li>视频控制器会按照VSync的信号逐行读取帧缓冲区的数据，经过可能的数据模型转换</li>
+<li>显示到屏幕上</li>
+</ul>
+<a id="more"></a>
+<h2 id="卡顿产生的原因"><a href="#卡顿产生的原因" class="headerlink" title="卡顿产生的原因"></a>卡顿产生的原因</h2><p><img src="https://kuiyu-1258489344.cos.ap-chengdu.myqcloud.com/IOS-UI-%E6%80%BB%E7%BB%93/draw.png" alt=""></p>
+<ul>
+<li>VSync信号到来之后，系统图形服务会通过CADisplayLink 等机制通过APP</li>
+<li>APP 主线程开始通过CPU计算显示内容，比如视频的创建，布局计算，图片解码等。</li>
+<li>CPU 计算好的的结果提交给GPU。</li>
+<li>GPU 进行变换、合成、渲染。</li>
+<li>GPU 提交到帧缓存区</li>
+<li>VSync 再次到来后显示</li>
+</ul>
+<blockquote>
+<p>如果两个VSync 的时间段内CPU和GPU没有全部处理完成提交。当前这一帧会被忽略，继续等待下一帧，这次屏幕显示会保留上次的显示不变。这就是界面卡顿的原因。</p>
+<p>CPU 和 GPU 不论哪个阻碍了显示流程，都会造成掉帧现象。所以开发时，也需要分别对 CPU 和 GPU 压力进行评估和优化。</p>
+</blockquote>
+<h3 id="CPU-资源消耗原因和优化"><a href="#CPU-资源消耗原因和优化" class="headerlink" title="CPU 资源消耗原因和优化"></a>CPU 资源消耗原因和优化</h3><p>对象创建会分配内存，调整属性，还有文件的读写操作等操作，比较消化CPU资源。</p>
+<p><strong>对象创建</strong></p>
+<ol>
+<li>尽量使用轻量级别的对象，比如CALayer比UIVIew 轻量，不需要点击事件，用CAlayer 比较合适</li>
+<li>尽量推迟对象创建时间。并把对象创业分配到多个任务中（比如懒加载）</li>
+<li>对象最好可以服用，服用的代价比创建，释放对象消耗小。对象尽量放在一个缓冲池中服用。</li>
+</ol>
+<p><strong>对象调整</strong></p>
+<p>对象调经常消耗CPU资源，CALayer内部没有属性，在调用相关属性时,是生成一个临时方法,调用结束后再把值存到 CALayer的一个字典中,所以在调整 UIView的相关属性时, UIView和 CALayer 之间会产生一系列的通知和代理.所以在优化性能时,应该尽量避免调整视图层次 添加和移除视图.</p>
+<p><strong>对象销毁</strong></p>
+<p>对象的销毁相对消耗的资源较少,通常当容器类持有大量对象时,其造成的消耗也是非常明显的,所以应当将消耗过程放到后台线程执行.</p>
+<p><strong>布局计算</strong></p>
+<ol>
+<li>布局计算也是常见的CPU 消耗.在页面内布局非常复杂时,最好能提前在后台计算好布局</li>
+<li>图片的size最好刚好跟UIImageView的size保持一致</li>
+</ol>
+<p><strong>文本渲染</strong></p>
+<p>大量文本显示的时候，用TextKit或CoreText 对文本异步绘制，能直接过去文本宽高信息，也能减少多次绘制。CoreText 对象占用内存较少，可以缓存下来以备稍后多次渲染。</p>
+<p><strong>控制一下线程的最大并发数量</strong></p>
+<p><strong>尽量把耗时的操作放到子线程</strong></p>
+<p><strong>图片的解码</strong></p>
+<p>UIImage 或者 CGImageSource 的那几个方法去创建图片的时候，图片数据并不会立刻解码。图片设置到 UIImageView 或者 CALayer.contents 中去，并且 CALayer 被提交到 CPU 前，CGImage 中的数据才会得到解码，这一步是发生在主线程的，并且不可避免。如果想绕开这个机制，常见的做法就是在后台线程先把图片绘制到 CGBitmapContent 中，然后从 Bitmap 直接创建图片。</p>
+<p><strong>图片的绘制</strong></p>
+<p>图片的绘制通常是指那些以 CG 开头的方法把图像放到画布中，常见的地方是 [UIView drawRect:] 。由于 CoreGraphic 方法通常都是线程安全的，所以图像的绘制可以很容易的放到后台线程去执行，一个简单的异步绘制的过程大概如下<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">- (void) display &#123;</span><br><span class="line">        dispatch_async(backgroundQueue, ^&#123;</span><br><span class="line">        CGContextRef ctx = CGBitmapContextCreate(...);</span><br><span class="line">        // draw in context...</span><br><span class="line">        CGImageRef img = CGBitmapContextCreateImage(ctx);</span><br><span class="line">        CFRelease(ctx);</span><br><span class="line">        dispatch_async(mainQueue, ^&#123;</span><br><span class="line">        layer.contents = img;</span><br><span class="line">        &#125;);</span><br><span class="line">    &#125;);</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure></p>
+<h4 id="GPU-资源消耗原因和优化"><a href="#GPU-资源消耗原因和优化" class="headerlink" title="GPU 资源消耗原因和优化"></a>GPU 资源消耗原因和优化</h4><blockquote>
+<p>GPU :接收提交的纹理（Texture）和顶点描述（三角形），应用变换（transform）、混合并渲染，然后输出到屏幕上。所有的 bitmap 包括图片、文本最终都要由内存提交到显存,绑定为 GPU Texture .无论是提交到显存的过程,还是GPU调整和渲染 Texture的过程,都要消耗不少的 GPU 资源.</p>
+</blockquote>
+<p><strong>纹理的渲染</strong></p>
+<ul>
+<li>所有的bitmap，view ，栅格化都要提交GPU，绑定GPU Texture，提交过程还是绑定过程都要消耗GPU资源。当在短时间内处理大量图片时候，CPU 占用率低，GPU占用率高。所以尽可能的多张照片合成一张照片。</li>
+<li>处理大图片，CPU，GPU 消耗都非常大，ios 纹理尺寸上限都是4096×4096。尽量不要让图片和视频超过这个值</li>
+</ul>
+<p><strong>视图的混合</strong><br>多个视图重叠后，GPU首先会把他们混合在一起。视图结果如果过于复杂。混合过程也会消耗很多GPU资源。</p>
+<ul>
+<li>尽量减少视图数量和层次</li>
+<li>不透明的视图里标明 opaque 属性以避免无用的 Alpha 通道合成</li>
+<li>也可以把多个视图预先渲染为一张图片来显示</li>
+</ul>
+<p><strong>图形的生成</strong></p>
+<ul>
+<li><p>离屏渲染： 处理图层的属性在被指定为未被预和成之前不能直接在屏幕上显示，GPU在当前屏幕以为缓冲区意外新开辟一个缓冲区进行的渲染操作。</p>
+</li>
+<li><p>离屏渲染的触发 ： CALayer 的 border、圆角、阴影、遮罩（mask），CASharpLayer 的矢量图形显示，通常会触发离屏渲染（offscreen rendering）</p>
+</li>
+<li><p>离屏渲染避免</p>
+<ol>
+<li>可以尝试开启 CALayer.shouldRasterize 属性，但这会把原本离屏渲染的操作转嫁到 CPU 上去</li>
+<li>用一张已经绘制好的圆角图片覆盖到原本视图上面来模拟相同的视觉效果</li>
+<li>就是把需要显示的图形在后台线程绘制为图片，避免使用圆角、阴影、遮罩等属性</li>
+</ol>
+</li>
+</ul>
+<h2 id="UIView-绘制原理"><a href="#UIView-绘制原理" class="headerlink" title="UIView 绘制原理"></a>UIView 绘制原理</h2><p>UIView 在调用setNeedsDisplay，系统调用view 对应layer 的setNeedsDisplay，对layer进行标记。VSync（runloop）消息到来的时候，调用 CAlayer 的dispaly 方法，进入真正的绘制流程中。</p>
+<blockquote>
+<p>App 的 主线程Runloop 在启动后会注册对应的 CFRunLoopSource 通过 mach_port 接收传过来的时钟信号通知，随后 Source 的回调会驱动整个 App 的动画与显示。</p>
+</blockquote>
+<p>CALayer的display方法的内部实现,首先会判断layer的delegete是否响应display方法,如果代理不响应就会进入到系统的绘制流程当中,如果响应,实际上就为我们提供了异步绘制的接口,这样就构成了UIView的绘制原理</p>
+<pre class="mermaid">graph TD
+A[&#91UIView setNeedDisplay&#93] 
+A-->B[&#91layer setNeedsDisplay&#93]
+B-->C[&#91CALayer display&#93]
+C-->D[&#91layer.delegate displayLayer&#93]
+D-->|YES| E[异步绘制入口]
+D-->|NO| F[系统绘制流程]
+E-->G[开始绘制]
+F-->G[开始绘制]</pre>
+
+
+
+<h5 id="异步绘制入口"><a href="#异步绘制入口" class="headerlink" title="异步绘制入口"></a>异步绘制入口</h5><ul>
+<li>CPU会为layer分配一块内存用来绘制bitmap，叫做backing store</li>
+<li>创建指向这块bitmap缓冲区的指针，叫做CGContextRef</li>
+<li>通过Quartz2D，绘制bitmap</li>
+<li>如果layer实现deleget（也就是 View 的drawRect）.可以通过drawRect方法做一些其他的绘制工作</li>
+<li>都有calayer上传backing store</li>
+</ul>
+<pre class="mermaid">graph TD
+A[CALayer 创建 backing store CGContextRef] 
+A-->B[layer 是否实现代理]
+B-->|NO|C[CAlayer drawInContext]
+B-->|YES|D[layer.delegate drawLayer:inContext:]
+D-->E[UIView drawRect:]
+C-->F
+E-->F[CALayer 上传CGContextRef 到GPU]</pre>
+##### 异步绘制
+如果遵从或者实现了displayLayer方法,我们就可以进入到异步绘制流程当中,在异步绘制的过程当中
+
+* 就由delegete去负责生成bitmap位图
+* 设置改bitmap作为layer.content属性的值
+
+<pre class="mermaid">graph TD
+A[main queue] 
+
+A-->C[AsyncDrawingView setNeedDisplay]
+C-->D[CALayer display]
+D-->E[AsyncDrawingView displayLayer]
+E-->F[Other work]
+F-->G[CAlayer setContents:]</pre>
+
+<pre class="mermaid">graph LR
+A[Global queue] 
+B{Other work} 
+Z[Global queue] 
+A-->B
+B-->C[CGBitmapContextCreate]
+B-->D[CoreGraphic API]
+B-->F[CGBitMapContextCreateImage]
+C-->Z
+D-->Z
+F-->Z</pre>
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/IOS/" rel="tag"># IOS</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/09/12/IOS-Block-总结/" rel="next" title="IOS Block 总结">
+                <i class="fa fa-chevron-left"></i> IOS Block 总结
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/01/03/二叉树排序/" rel="prev" title="二叉树排序">
+                二叉树排序 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">智奎宇</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">16</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  <a href="/categories/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">10</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">9</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#UI-视图"><span class="nav-number">1.</span> <span class="nav-text">UI 视图</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#屏幕的显示原理"><span class="nav-number">1.1.</span> <span class="nav-text">屏幕的显示原理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#卡顿产生的原因"><span class="nav-number">1.2.</span> <span class="nav-text">卡顿产生的原因</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#CPU-资源消耗原因和优化"><span class="nav-number">1.2.1.</span> <span class="nav-text">CPU 资源消耗原因和优化</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#GPU-资源消耗原因和优化"><span class="nav-number">1.2.1.1.</span> <span class="nav-text">GPU 资源消耗原因和优化</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#UIView-绘制原理"><span class="nav-number">1.3.</span> <span class="nav-text">UIView 绘制原理</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#异步绘制入口"><span class="nav-number">1.3.0.0.1.</span> <span class="nav-text">异步绘制入口</span></a></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">智奎宇</span>
+
+  
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v3.8.0</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> v6.7.0</div>
+
+
+
+
+
+  <script src="https://unpkg.com/mermaid@<%= theme.mermaid.version %>/dist/mermaid.min.js"></script>
+  <script>
+    if (window.mermaid) {
+      mermaid.initialize({theme: 'forest'});
+    }
+  </script>
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+    
+    
+  
+  <script color="0,0,255" opacity="0.5" zindex="-1" count="99" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/src/utils.js?v=6.7.0"></script>
+
+  <script src="/js/src/motion.js?v=6.7.0"></script>
+
+
+
+  
+  
+
+  
+  <script src="/js/src/scrollspy.js?v=6.7.0"></script>
+<script src="/js/src/post-details.js?v=6.7.0"></script>
+
+
+
+  
+
+
+  <script src="/js/src/bootstrap.js?v=6.7.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script>
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url).replace(/\/{2,}/g, '/');
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x"></i></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x"></i></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

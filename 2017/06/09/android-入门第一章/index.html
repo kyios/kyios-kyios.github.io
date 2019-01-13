@@ -1,0 +1,1501 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=6.7.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.7.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.7.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.7.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.7.0" color="#222">
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '6.7.0',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="关于 AndroidManifest.xml是安装程序的必须文件，是整个项目的配置文件，对各个节点进行分析 第一层 Manifest : (属性)12345678&amp;lt;manifest  xmlns:android=&amp;quot;http://schemas.android.com/apk/res/android&amp;quot;          package=&amp;quot;com.roobo.tes">
+<meta name="keywords" content="java,开发">
+<meta property="og:type" content="article">
+<meta property="og:title" content="android :AndroidManifest.xml">
+<meta property="og:url" content="http://kuiyu.top/2017/06/09/android-入门第一章/index.html">
+<meta property="og:site_name" content="kieran">
+<meta property="og:description" content="关于 AndroidManifest.xml是安装程序的必须文件，是整个项目的配置文件，对各个节点进行分析 第一层 Manifest : (属性)12345678&amp;lt;manifest  xmlns:android=&amp;quot;http://schemas.android.com/apk/res/android&amp;quot;          package=&amp;quot;com.roobo.tes">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-01-05T03:42:05.838Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="android :AndroidManifest.xml">
+<meta name="twitter:description" content="关于 AndroidManifest.xml是安装程序的必须文件，是整个项目的配置文件，对各个节点进行分析 第一层 Manifest : (属性)12345678&amp;lt;manifest  xmlns:android=&amp;quot;http://schemas.android.com/apk/res/android&amp;quot;          package=&amp;quot;com.roobo.tes">
+
+
+
+
+
+
+  <link rel="canonical" href="http://kuiyu.top/2017/06/09/android-入门第一章/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>android :AndroidManifest.xml | kieran</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">kieran</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <p class="site-subtitle">开发</p>
+      
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+
+      
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://kuiyu.top/2017/06/09/android-入门第一章/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="智奎宇">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="kieran">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">android :AndroidManifest.xml
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2017-06-09 16:30:00" itemprop="dateCreated datePublished" datetime="2017-06-09T16:30:00+08:00">2017-06-09</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-01-05 11:42:05" itemprop="dateModified" datetime="2019-01-05T11:42:05+08:00">2019-01-05</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing"><a href="/categories/android/" itemprop="url" rel="index"><span itemprop="name">android</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="关于-AndroidManifest-xml"><a href="#关于-AndroidManifest-xml" class="headerlink" title="关于 AndroidManifest.xml"></a>关于 AndroidManifest.xml</h2><p>是安装程序的必须文件，是整个项目的配置文件，对各个节点进行分析</p>
+<h4 id="第一层-Manifest-属性"><a href="#第一层-Manifest-属性" class="headerlink" title="第一层 Manifest : (属性)"></a>第一层 Manifest : (属性)</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">&lt;manifest  xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;</span><br><span class="line">          package=&quot;com.roobo.test&quot;</span><br><span class="line">          android:sharedUserId=&quot;string&quot;</span><br><span class="line">          android:sharedUserLabel=&quot;string resource&quot;</span><br><span class="line">          android:versionCode=&quot;integer&quot;</span><br><span class="line">          android:versionName=&quot;string&quot;</span><br><span class="line">          android:installLocation=[&quot;auto&quot; | &quot;internalOnly&quot; | &quot;preferExternal&quot;] &gt;</span><br><span class="line">&lt;/manifest&gt;</span><br></pre></td></tr></table></figure>
+<a id="more"></a>
+<ul>
+<li><p>xmlns:android</p>
+<blockquote>
+<p>定义android命名空间，一般为<br><a href="http://schemas.android.com/apk/res/android，">http://schemas.android.com/apk/res/android，</a>  这样使得Android中各种标准属性能在文件中使用，提供了大部分元素中的数据</p>
+</blockquote>
+</li>
+<li><p>package</p>
+<blockquote>
+<p>指定本应用内java主程序包的包名，它也是一个应用程序的唯一标识符</p>
+</blockquote>
+</li>
+<li><p>sharedUserId</p>
+<blockquote>
+<p>Android给每个APK进程分配一个单独的用户空间,其manifest中的userid就是对应一个Linux用户<br>(Android 系统是基于Linux)的.<br>所以不同APK(用户)间互相访问数据默认是禁止的.<br>但是它也提供了2种APK间共享数据的形式:<br>相当于ios 的 URL Schemes(应用间跳转)</p>
+</blockquote>
+</li>
+<li><p>sharedUserLabel</p>
+<blockquote>
+<p>一个共享的用户名，它只有在设置了sharedUserId属性的前提下才会有意义</p>
+</blockquote>
+</li>
+<li><p>versionCode</p>
+<blockquote>
+<p>是给设备程序识别版本(升级)用的必须是一个interger值代表app更新过多少次，比如第一版一般为1，之后若要更新版本就设置为2，3等等</p>
+</blockquote>
+</li>
+<li><p>versionName</p>
+<blockquote>
+<p>这个名称是给用户看的,如当前的版本是 2.0.1</p>
+</blockquote>
+</li>
+<li><p>installLocation</p>
+<blockquote>
+<p>安装参数，是Android2.2中的一个新特性，installLocation有三个值可以选择：internalOnly、auto、preferExternal</p>
+</blockquote>
+</li>
+</ul>
+<blockquote>
+<p>选择preferExternal,系统会优先考虑将APK安装到SD卡上(当然最终用户可以选择为内部ROM存储上，如果SD存储已满，也会安装到内部存储上)</p>
+</blockquote>
+<blockquote>
+<p>选择auto，系统将会根据存储空间自己去适应</p>
+</blockquote>
+<blockquote>
+<p>选择internalOnly是指必须安装到内部才能运行</p>
+</blockquote>
+<p><code>(注：需要进行后台类监控的APP最好安装在内部，而一些较大的游戏APP最好安装在SD卡上。现默认为安装在内部，如果把APP安装在SD卡上，首先得设置你的level为8，并且要配置android:installLocation这个参数的属性为preferExternal)</code></p>
+<h4 id="第二层Application属性"><a href="#第二层Application属性" class="headerlink" title="第二层Application属性"></a>第二层Application属性</h4><h5 id="每个app-都必须声明当前配置标签-标签声明了每一个应用程序的组件及其属性-如icon-label-permission等"><a href="#每个app-都必须声明当前配置标签-标签声明了每一个应用程序的组件及其属性-如icon-label-permission等" class="headerlink" title="每个app 都必须声明当前配置标签,标签声明了每一个应用程序的组件及其属性(如icon,label,permission等)"></a>每个app 都必须声明当前配置标签,标签声明了每一个应用程序的组件及其属性(如icon,label,permission等)</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">&lt;application  android:allowClearUserData=[&quot;true&quot; | &quot;false&quot;]</span><br><span class="line">             android:allowTaskReparenting=[&quot;true&quot; | &quot;false&quot;]</span><br><span class="line">             android:backupAgent=&quot;string&quot;</span><br><span class="line">             android:debuggable=[&quot;true&quot; | &quot;false&quot;]</span><br><span class="line">             android:description=&quot;string resource&quot;</span><br><span class="line">             android:enabled=[&quot;true&quot; | &quot;false&quot;]</span><br><span class="line">             android:hasCode=[&quot;true&quot; | &quot;false&quot;]</span><br><span class="line">             android:icon=&quot;drawable resource&quot;</span><br><span class="line">             android:killAfterRestore=[&quot;true&quot; | &quot;false&quot;]</span><br><span class="line">             android:label=&quot;string resource&quot;</span><br><span class="line">             android:manageSpaceActivity=&quot;string&quot;</span><br><span class="line">             android:name=&quot;string&quot;</span><br><span class="line">             android:permission=&quot;string&quot;</span><br><span class="line">             android:persistent=[&quot;true&quot; | &quot;false&quot;]</span><br><span class="line">             android:process=&quot;string&quot;</span><br><span class="line">             android:restoreAnyVersion=[&quot;true&quot; | &quot;false&quot;]</span><br><span class="line">             android:taskAffinity=&quot;string&quot;</span><br><span class="line">             android:theme=&quot;resource or theme&quot; &gt;</span><br><span class="line">&lt;/application&gt;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>android:allowClearUserData(‘true’ or ‘false’)</li>
+</ul>
+<blockquote>
+<p>用户是否能选择自行清除数据，默认为true，程序管理器包含一个选择允许用户清除数据。当为true时，用户可自己清理用户数据，反之亦然</p>
+</blockquote>
+<ul>
+<li>android:allowTaskReparenting(‘true’ or ‘false’)</li>
+</ul>
+<blockquote>
+<p>是否允许activity更换从属的任务，比如从短信息任务切换到浏览器任务</p>
+</blockquote>
+<ul>
+<li>android:backupAgent</li>
+</ul>
+<blockquote>
+<p>设置该APP的备份，属性值应该是一个完整的类名，如com.project.TestCase，此属性并没有默认值，并且类名必须得指定(就是个备份工具，将数据备份到云端的操作)</p>
+</blockquote>
+<ul>
+<li>android:debuggable</li>
+</ul>
+<blockquote>
+<p>这个从字面上就可以看出是什么作用的，当设置为true时，表明该APP在手机上可以被调试。默认为false,在false的情况下调试该APP，就会报以下错误：</p>
+<p>Device XXX requires that applications explicitely declare themselves as debuggable in their manifest.</p>
+<p> Application XXX does not have the attribute ‘debuggable’ set to TRUE in its manifest and cannot be debugged.</p>
+</blockquote>
+<ul>
+<li>android:description/android:label</li>
+</ul>
+<blockquote>
+<p>此两个属性都是为许可提供的，均为字符串资源，当用户去看许可列表(android:label)或者某个许可的详细信息(android:description)时，这些字符串资源就可以显示给用户。label应当尽量简短，之需要告知用户该许可是在保护什么功能就行。而description可以用于具体描述获取该许可的程序可以做哪些事情，实际上让用户可以知道如果他们同意程序获取该权限的话，该程序可以做什么。我们通常用两句话来描述许可，第一句描述该许可，第二句警告用户如果批准该权限会可能有什么不好的事情发生</p>
+</blockquote>
+<ul>
+<li>android:enabled</li>
+</ul>
+<blockquote>
+<p>Android系统是否能够实例化该应用程序的组件，如果为true，每个组件的enabled属性决定那个组件是否可以被 enabled。如果为false，它覆盖组件指定的值；所有组件都是disabled。</p>
+</blockquote>
+<ul>
+<li>android:hasCode(‘true’ or ‘false’)</li>
+</ul>
+<blockquote>
+<p>表示此APP是否包含任何的代码，默认为true，若为false，则系统在运行组件时，不会去尝试加载任何的APP代码</p>
+<p>一个应用程序自身不会含有任何的代码，除非内置组件类，比如Activity类，此类使用了AliasActivity类，当然这是个罕见的现象</p>
+<p>(在Android2.3可以用标准C来开发应用程序，可在androidManifest.xml中将此属性设置为false,因为这个APP本身已经不含有任何的JAVA代码了)</p>
+</blockquote>
+<ul>
+<li>android:icon</li>
+</ul>
+<blockquote>
+<p>就是声明整个APP的图标，图片一般都放在drawable文件夹下</p>
+</blockquote>
+<ul>
+<li>android:killAfterRestore</li>
+</ul>
+<blockquote>
+<p>这个属性是指在一个完整的系统恢复操作之后应用程序是否被终止。单个应用程序的恢复操作不会引起应用程序的终止。完整的系统恢复操作一般仅在手机首次安装时才会发生一次。第三方应用通常都不需要使用该属性。</p>
+<p>该属性的默认值为true，意为在完整的系统恢复期间，应用程序在结束处理其数据之后将被终止。</p>
+</blockquote>
+<ul>
+<li>android:manageSpaceActivity</li>
+</ul>
+<blockquote>
+<p>意思是用于指定一个Activity来管理数据，加上这个属性，指定SettingActivity为管理空间的Activity</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&lt;application  </span><br><span class="line">        android:manageSpaceActivity=&quot;.activity.SettingActivity&quot; &gt;  </span><br><span class="line">&lt;/application&gt;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>android:name</li>
+</ul>
+<blockquote>
+<p>为应用程序所实现的Application子类的全名。当应用程序进程开始时，该类在所有应用程序组件之前被实例化。</p>
+<p>若该类(比方androidMain类)是在声明的package下，则可以直接声明android:name=”androidMain”,但此类是在package下面的子包的话，就必须声明为全路径或android:name=”package名称.子包名成.androidMain”</p>
+</blockquote>
+<ul>
+<li>android:permission</li>
+</ul>
+<blockquote>
+<p>设置许可名，这个属性若在<application>上定义的话，是一个给应用程序的所有组件设置许可的便捷方式，当然它是被各组件设置的许可名所覆盖的</application></p>
+</blockquote>
+<ul>
+<li>android:presistent</li>
+</ul>
+<blockquote>
+<p>该应用程序是否应该在任何时候都保持运行状态,默认为false。因为应用程序通常不应该设置本标识，持续模式仅仅应该设置给某些系统应用程序才是有意义的。</p>
+</blockquote>
+<ul>
+<li>android:process</li>
+</ul>
+<blockquote>
+<p>应用程序运行的进程名，它的默认值为<manifest>元素里设置的包名，当然每个组件都可以通过设置该属性来覆盖默认值。如果你想两个应用程序共用一个进程的话，你可以设置他们的android:process相同，但前提条件是他们共享一个用户ID及被赋予了相同证书的时候</manifest></p>
+</blockquote>
+<ul>
+<li>android:restoreAnyVersion</li>
+</ul>
+<blockquote>
+<p>用来表明应用是否准备尝试恢复所有的备份，甚至该备份是比当前设备上更要新的版本，默认是false</p>
+</blockquote>
+<ul>
+<li>android:taskAffinity</li>
+</ul>
+<blockquote>
+<p>拥有相同的affinity的Activity理论上属于相同的Task，应用程序默认的affinity的名字是<manifest>元素中设定的package名</manifest></p>
+</blockquote>
+<ul>
+<li>android:theme</li>
+</ul>
+<blockquote>
+<p>是一个资源的风格，它定义了一个默认的主题风格给所有的activity,当然也可以在自己的theme里面去设置它，有点类似style。</p>
+</blockquote>
+<h4 id="第三层-属性"><a href="#第三层-属性" class="headerlink" title="第三层:属性"></a>第三层<activity>:属性</activity></h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line">&lt;activity android:allowTaskReparenting=[&quot;true&quot; | &quot;false&quot;]</span><br><span class="line">          android:alwaysRetainTaskState=[&quot;true&quot; | &quot;false&quot;]</span><br><span class="line">          android:clearTaskOnLaunch=[&quot;true&quot; | &quot;false&quot;]</span><br><span class="line">          android:configChanges=[&quot;mcc&quot;, &quot;mnc&quot;, &quot;locale&quot;,</span><br><span class="line">                                 &quot;touchscreen&quot;, &quot;keyboard&quot;, &quot;keyboardHidden&quot;,</span><br><span class="line">                                 &quot;navigation&quot;, &quot;orientation&quot;, &quot;screenLayout&quot;,</span><br><span class="line">                                 &quot;fontScale&quot;, &quot;uiMode&quot;]</span><br><span class="line">          android:enabled=[&quot;true&quot; | &quot;false&quot;]</span><br><span class="line">          android:excludeFromRecents=[&quot;true&quot; | &quot;false&quot;]</span><br><span class="line">          android:exported=[&quot;true&quot; | &quot;false&quot;]</span><br><span class="line">          android:finishOnTaskLaunch=[&quot;true&quot; | &quot;false&quot;]</span><br><span class="line">          android:icon=&quot;drawable resource&quot;</span><br><span class="line">          android:label=&quot;string resource&quot;</span><br><span class="line">          android:launchMode=[&quot;multiple&quot; | &quot;singleTop&quot; |</span><br><span class="line">                              &quot;singleTask&quot; | &quot;singleInstance&quot;]</span><br><span class="line">          android:multiprocess=[&quot;true&quot; | &quot;false&quot;]</span><br><span class="line">          android:name=&quot;string&quot;</span><br><span class="line">          android:noHistory=[&quot;true&quot; | &quot;false&quot;]  </span><br><span class="line">          android:permission=&quot;string&quot;</span><br><span class="line">          android:process=&quot;string&quot;</span><br><span class="line">          android:screenOrientation=[&quot;unspecified&quot; | &quot;user&quot; | &quot;behind&quot; |</span><br><span class="line">                                     &quot;landscape&quot; | &quot;portrait&quot; |</span><br><span class="line">                                     &quot;sensor&quot; | &quot;nosensor&quot;]</span><br><span class="line">          android:stateNotNeeded=[&quot;true&quot; | &quot;false&quot;]</span><br><span class="line">          android:taskAffinity=&quot;string&quot;</span><br><span class="line">          android:theme=&quot;resource or theme&quot;</span><br><span class="line">          android:windowSoftInputMode=[&quot;stateUnspecified&quot;,</span><br><span class="line">                                       &quot;stateUnchanged&quot;, &quot;stateHidden&quot;,</span><br><span class="line">                                       &quot;stateAlwaysHidden&quot;, &quot;stateVisible&quot;,</span><br><span class="line">                                       &quot;stateAlwaysVisible&quot;, &quot;adjustUnspecified&quot;,</span><br><span class="line">                                       &quot;adjustResize&quot;, &quot;adjustPan&quot;] &gt;   </span><br><span class="line">&lt;/activity&gt;</span><br></pre></td></tr></table></figure>
+<p>*android:clearTaskOnLaunch </p>
+<blockquote>
+<p>比如 P 是 activity, Q 是被P 触发的 activity, 然后返回Home, 重新启动 P，是否显示 Q</p>
+</blockquote>
+<p>*android:excludeFromRecents</p>
+<blockquote>
+<p>是否可被显示在最近打开的activity列表里，默认是false</p>
+</blockquote>
+<ul>
+<li>android:finishOnTaskLaunch</li>
+</ul>
+<blockquote>
+<p>当用户重新启动这个任务的时候，是否关闭已打开的activity，默认是false</p>
+<p>如果这个属性和allowTaskReparenting都是true,这个属性就是王牌。Activity的亲和力将被忽略。该Activity已经被摧毁并非re-parented</p>
+</blockquote>
+<ul>
+<li>android:launchMode(Activity加载模式)</li>
+</ul>
+<blockquote>
+<p>在多Activity开发中，有可能是自己应用之间的Activity跳转，或者夹带其他应用的可复用Activity。可能会希望跳转到原来某个Activity实例，而不是产生大量重复的Activity。这需要为Activity配置特定的加载模式，而不是使用默认的加载模式</p>
+<p>Activity有四种加载模式：</p>
+<p>standard、singleTop、singleTask、singleInstance(其中前两个是一组、后两个是一组)，默认为standard </p>
+<p>standard：就是intent将发送给新的实例，所以每次跳转都会生成新的activity。</p>
+<p>singleTop：也是发送新的实例，但不同standard的一点是，在请求的Activity正好位于栈顶时(配置成singleTop的Activity)，不会构造新的实例</p>
+<p>singleTask：和后面的singleInstance都只创建一个实例，当intent到来，需要创建设置为singleTask的Activity的时候，系统会检查栈里面是否已经有该Activity的实例。如果有直接将intent发送给它。</p>
+<p>singleInstance：</p>
+<p>首先说明一下task这个概念，Task可以认为是一个栈，可放入多个Activity。比如启动一个应用，那么Android就创建了一个Task，然后启动这个应用的入口Activity，那在它的界面上调用其他的Activity也只是在这个task里面。那如果在多个task中共享一个Activity的话怎么办呢。举个例来说，如果开启一个导游服务类的应用程序，里面有个Activity是开启GOOGLE地图的，当按下home键退回到主菜单又启动GOOGLE地图的应用时，显示的就是刚才的地图，实际上是同一个Activity，实际上这就引入了singleInstance。singleInstance模式就是将该Activity单独放入一个栈中，这样这个栈中只有这一个Activity，不同应用的intent都由这个Activity接收和展示，这样就做到了共享。当然前提是这些应用都没有被销毁，所以刚才是按下的HOME键，如果按下了返回键，则无效</p>
+</blockquote>
+<ul>
+<li>android:multiprocess</li>
+</ul>
+<blockquote>
+<p>是否允许多进程，默认是false</p>
+</blockquote>
+<ul>
+<li>android:noHistory</li>
+</ul>
+<blockquote>
+<p>当用户从Activity上离开并且它在屏幕上不再可见时，Activity是否从Activity stack中清除并结束。默认是false。Activity不会留下历史痕迹</p>
+</blockquote>
+<ul>
+<li>android:screenOrientation</li>
+</ul>
+<blockquote>
+<p>activity显示的模式</p>
+<p>默认为unspecified：由系统自动判断显示方向</p>
+<p>landscape横屏模式，宽度比高度大</p>
+<p>portrait竖屏模式, 高度比宽度大</p>
+<p>user模式，用户当前首选的方向</p>
+<p>behind模式：和该Activity下面的那个Activity的方向一致(在Activity堆栈中的)</p>
+<p>sensor模式：有物理的感应器来决定。如果用户旋转设备这屏幕会横竖屏切换<br>nosensor模式：忽略物理感应器，这样就不会随着用户旋转设备而更改了</p>
+</blockquote>
+<ul>
+<li>android:stateNotNeeded</li>
+</ul>
+<blockquote>
+<p>activity被销毁或者成功重启时是否保存状态</p>
+</blockquote>
+<ul>
+<li>android:windowSoftInputMode</li>
+</ul>
+<blockquote>
+<p>activity主窗口与软键盘的交互模式，可以用来避免输入法面板遮挡问题，Android1.5后的一个新特性。</p>
+<p>这个属性能影响两件事情：</p>
+<p>【A】当有焦点产生时，软键盘是隐藏还是显示</p>
+<p>【B】是否减少活动主窗口大小以便腾出空间放软键盘</p>
+<p>各值的含义：</p>
+<p>【A】stateUnspecified：软键盘的状态并没有指定，系统将选择一个合适的状态或依赖于主题的设置</p>
+<p>【B】stateUnchanged：当这个activity出现时，软键盘将一直保持在上一个activity里的状态，无论是隐藏还是显示</p>
+<p>【C】stateHidden：用户选择activity时，软键盘总是被隐藏</p>
+<p>【D】stateAlwaysHidden：当该Activity主窗口获取焦点时，软键盘也总是被隐藏的</p>
+<p>【E】stateVisible：软键盘通常是可见的</p>
+<p>【F】stateAlwaysVisible：用户选择activity时，软键盘总是显示的状态</p>
+<p>【G】adjustUnspecified：默认设置，通常由系统自行决定是隐藏还是显示</p>
+<p>【H】adjustResize：该Activity总是调整屏幕的大小以便留出软键盘的空间</p>
+<p>【I】adjustPan：当前窗口的内容将自动移动以便当前焦点从不被键盘覆盖和用户能总是看到输入内容的部分</p>
+</blockquote>
+<h4 id="第四层"><a href="#第四层" class="headerlink" title="第四层()"></a>第四层(<intent-filter>)</intent-filter></h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&lt;intent-filter  android:icon=&quot;drawable resource&quot;</span><br><span class="line">               android:label=&quot;string resource&quot;</span><br><span class="line">               android:priority=&quot;integer&quot; &gt;</span><br><span class="line">      &lt;action /&gt;</span><br><span class="line">      &lt;category /&gt;</span><br><span class="line">      &lt;data /&gt;</span><br><span class="line">&lt;/intent-filter&gt;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>intent-filter属性</li>
+</ul>
+<blockquote>
+<p>android:priority(解释：有序广播主要是按照声明的优先级别，如A的级别高于B，那么，广播先传给A，再传给B。优先级别就是用设置priority属性来确定，范围是从-1000～1000，数越大优先级别越高)</p>
+<p>Intent filter内会设定的资料包括action,data与category三种。也就是说filter只会与intent里的这三种资料作对比动作</p>
+</blockquote>
+<ul>
+<li>action属性</li>
+</ul>
+<blockquote>
+<p>action很简单，只有android:name这个属性。常见的android:name值为android.intent.action.MAIN，表明此activity是作为应用程序的入口。有关android:name具体有哪些值，可参照这个网址：<a href="http://hi.baidu.com/linghtway/blog/item/83713cc1c2d053170ff477a7.html">http://hi.baidu.com/linghtway/blog/item/83713cc1c2d053170ff477a7.html</a></p>
+</blockquote>
+<ul>
+<li>category属性</li>
+</ul>
+<blockquote>
+<p>category也只有android:name属性。常见的android:name值为android.intent.category.LAUNCHER(决定应用程序是否显示在程序列表里)</p>
+</blockquote>
+<ul>
+<li>data属性</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&lt;data  android:host=&quot;string&quot;</span><br><span class="line">      android:mimeType=&quot;string&quot;</span><br><span class="line">      android:path=&quot;string&quot;</span><br><span class="line">      android:pathPattern=&quot;string&quot;</span><br><span class="line">      android:pathPrefix=&quot;string&quot;</span><br><span class="line">      android:port=&quot;string&quot;</span><br><span class="line">      android:scheme=&quot;string&quot;/&gt;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>【1】每个<data>元素指定一个URI和数据类型（MIME类型）。它有四个属性scheme、host、port、path对应于URI的每个部分：<br>scheme://host:port/path</data></p>
+<p>scheme的值一般为”http”，host为包名，port为端口号，path为具体地址。如：<a href="http://com.test.project:200/folder/etc">http://com.test.project:200/folder/etc</a></p>
+<p>其中host和port合起来构成URI的凭据(authority)，如果host没有指定，则port也会被忽略</p>
+<p>要让authority有意义，scheme也必须要指定。要让path有意义，scheme+authority也必须要指定</p>
+<p>【2】mimeType（指定数据类型），若mimeType为’Image’，则会从content Provider的指定地址中获取image类型的数据。还有’video’啥的，若设置为video/mp4，则表示在指定地址中获取mp4格式的video文件</p>
+<p>【3】而pathPattern和PathPrefix主要是为了格式化path所使用的</p>
+</blockquote>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/java/" rel="tag"># java</a>
+          
+            <a href="/tags/开发/" rel="tag"># 开发</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/01/18/cocoapod/" rel="next" title="cocoapod 笔记">
+                <i class="fa fa-chevron-left"></i> cocoapod 笔记
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/06/22/Android-四大组件之SharedPrefernces/" rel="prev" title="android:数据存储SharedPrefernces">
+                android:数据存储SharedPrefernces <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">智奎宇</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">16</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  <a href="/categories/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">10</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">9</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#关于-AndroidManifest-xml"><span class="nav-number">1.</span> <span class="nav-text">关于 AndroidManifest.xml</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#第一层-Manifest-属性"><span class="nav-number">1.0.1.</span> <span class="nav-text">第一层 Manifest : (属性)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#第二层Application属性"><span class="nav-number">1.0.2.</span> <span class="nav-text">第二层Application属性</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#每个app-都必须声明当前配置标签-标签声明了每一个应用程序的组件及其属性-如icon-label-permission等"><span class="nav-number">1.0.2.1.</span> <span class="nav-text">每个app 都必须声明当前配置标签,标签声明了每一个应用程序的组件及其属性(如icon,label,permission等)</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#第三层-属性"><span class="nav-number">1.0.3.</span> <span class="nav-text">第三层:属性</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#第四层"><span class="nav-number">1.0.4.</span> <span class="nav-text">第四层()</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">智奎宇</span>
+
+  
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v3.8.0</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> v6.7.0</div>
+
+
+
+
+
+  <script src="https://unpkg.com/mermaid@<%= theme.mermaid.version %>/dist/mermaid.min.js"></script>
+  <script>
+    if (window.mermaid) {
+      mermaid.initialize({theme: 'forest'});
+    }
+  </script>
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+    
+    
+  
+  <script color="0,0,255" opacity="0.5" zindex="-1" count="99" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/src/utils.js?v=6.7.0"></script>
+
+  <script src="/js/src/motion.js?v=6.7.0"></script>
+
+
+
+  
+  
+
+  
+  <script src="/js/src/scrollspy.js?v=6.7.0"></script>
+<script src="/js/src/post-details.js?v=6.7.0"></script>
+
+
+
+  
+
+
+  <script src="/js/src/bootstrap.js?v=6.7.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script>
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url).replace(/\/{2,}/g, '/');
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x"></i></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x"></i></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

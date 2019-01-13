@@ -1,0 +1,1344 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=6.7.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.7.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.7.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.7.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.7.0" color="#222">
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '6.7.0',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="Runtime: 是基于c的api,是iOS内部的核心之一,底层都是基于它来实现的,oc是一门动态语言,在编译后好多类和对象是编译器不知道的,这时候需要运行时系统(runtime-system)来处理编译后的代码.  [TOC] Runtime消息传递方法调用在OC中方法都是通过Runtime实现的。下面效果是相同的12345678TestClass * test  = [[TestClass">
+<meta name="keywords" content="IOS">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ios Runtime 总结">
+<meta property="og:url" content="http://kuiyu.top/2019/01/12/ios-Runtime-总结/index.html">
+<meta property="og:site_name" content="kieran">
+<meta property="og:description" content="Runtime: 是基于c的api,是iOS内部的核心之一,底层都是基于它来实现的,oc是一门动态语言,在编译后好多类和对象是编译器不知道的,这时候需要运行时系统(runtime-system)来处理编译后的代码.  [TOC] Runtime消息传递方法调用在OC中方法都是通过Runtime实现的。下面效果是相同的12345678TestClass * test  = [[TestClass">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://kuiyu-1258489344.cos.ap-chengdu.myqcloud.com/ios-Runtime-%E6%80%BB%E7%BB%93/messagere.png">
+<meta property="og:image" content="https://kuiyu-1258489344.cos.ap-chengdu.myqcloud.com/ios-Runtime-%E6%80%BB%E7%BB%93/machover.png">
+<meta property="og:image" content="https://kuiyu-1258489344.cos.ap-chengdu.myqcloud.com/ios-Runtime-%E6%80%BB%E7%BB%93/stafdsa.png">
+<meta property="og:updated_time" content="2019-01-12T13:12:30.444Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="ios Runtime 总结">
+<meta name="twitter:description" content="Runtime: 是基于c的api,是iOS内部的核心之一,底层都是基于它来实现的,oc是一门动态语言,在编译后好多类和对象是编译器不知道的,这时候需要运行时系统(runtime-system)来处理编译后的代码.  [TOC] Runtime消息传递方法调用在OC中方法都是通过Runtime实现的。下面效果是相同的12345678TestClass * test  = [[TestClass">
+<meta name="twitter:image" content="https://kuiyu-1258489344.cos.ap-chengdu.myqcloud.com/ios-Runtime-%E6%80%BB%E7%BB%93/messagere.png">
+
+
+
+
+
+
+  <link rel="canonical" href="http://kuiyu.top/2019/01/12/ios-Runtime-总结/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>ios Runtime 总结 | kieran</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">kieran</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <p class="site-subtitle">开发</p>
+      
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+
+      
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://kuiyu.top/2019/01/12/ios-Runtime-总结/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="智奎宇">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="kieran">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">ios Runtime 总结
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-01-12 20:49:54 / 修改时间：21:12:30" itemprop="dateCreated datePublished" datetime="2019-01-12T20:49:54+08:00">2019-01-12</time>
+            
+
+            
+              
+
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing"><a href="/categories/Runtime/" itemprop="url" rel="index"><span itemprop="name">Runtime</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <blockquote>
+<p>Runtime: 是基于c的api,是iOS内部的核心之一,底层都是基于它来实现的,oc是一门动态语言,在编译后好多类和对象是编译器不知道的,这时候需要运行时系统(runtime-system)来处理编译后的代码.</p>
+</blockquote>
+<p>[TOC]</p>
+<h3 id="Runtime消息传递"><a href="#Runtime消息传递" class="headerlink" title="Runtime消息传递"></a>Runtime消息传递</h3><h4 id="方法调用"><a href="#方法调用" class="headerlink" title="方法调用"></a>方法调用</h4><p>在OC中方法都是通过Runtime实现的。下面效果是相同的<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">TestClass * test  = [[TestClass alloc] init];</span><br><span class="line">//----------------------------------------</span><br><span class="line">[test testfun];</span><br><span class="line">((SEL (*)(id, SEL))(void *)objc_msgSend)((id)test, @selector(testfun));</span><br><span class="line">//----------------------------------------</span><br><span class="line">//方法带参数</span><br><span class="line">[test testfunArg1:333 Arg2:@&quot;abcd&quot;];</span><br><span class="line">((void (*)(id, SEL, long double , NSString *))(void *) objc_msgSend)((id)test, @selector(testfunArg1:Arg2:), 333 ,@&quot;abcd&quot;);</span><br></pre></td></tr></table></figure></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">//类方法调用</span><br><span class="line">objc_msgSend(objc_getClass(&quot;TestClass&quot;), sel_registerName(&quot;alloc&quot;));</span><br></pre></td></tr></table></figure>
+<p><strong>项目中不同的类声明不同的方法，SEL 是同一个</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">TestClass * test  = [[TestClass alloc] init];</span><br><span class="line">[test testfun];</span><br><span class="line">    </span><br><span class="line">TestClass2 * test2  = [[TestClass2 alloc] init];</span><br><span class="line">[test2 testfun];</span><br><span class="line"></span><br><span class="line">//打印结果</span><br><span class="line">TestObject testMethod 0x1097799f2</span><br><span class="line">TestObject testMethod 0x1097799f2</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>Runtime 中维护了一个<code>SEL</code>的表。这个表不按类来存储。只要<code>SEL</code>相同就当做同一个，存储到表中。项目加载的时候所有的方法都会加载到这个表中，动态生成的方法也就加载到表中。</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">static struct /*_method_list_t*/ &#123;</span><br><span class="line">	unsigned int entsize;  // sizeof(struct _objc_method)</span><br><span class="line">	unsigned int method_count;</span><br><span class="line">	struct _objc_method method_list[3];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<a id="more"></a>
+<h4 id="隐藏参数"><a href="#隐藏参数" class="headerlink" title="隐藏参数"></a>隐藏参数</h4><p>常用的2个隐藏参数 <code>self</code> <code>_cmd</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">@interface TestClass : NSObject&#123;</span><br><span class="line">    int testVal ;</span><br><span class="line">&#125;</span><br><span class="line">@end</span><br><span class="line">//oc 类</span><br><span class="line">@implementation TestClass</span><br><span class="line">- (instancetype)init</span><br><span class="line">&#123;</span><br><span class="line">    self = [super init];</span><br><span class="line">    if (self) &#123;</span><br><span class="line">    &#125;</span><br><span class="line">    return self;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">- (void)testfun:(NSString *)string&#123;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">void testCfun(int abc)&#123;</span><br><span class="line">//如果调用类里面函数的全局变量</span><br><span class="line">    testVal = 10; //build error Use of undeclared identifier &apos;testVal&apos;</span><br><span class="line">&#125;</span><br><span class="line">@end</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">转换后</span><br><span class="line">static instancetype _I_TestClass_init(TestClass * self, SEL _cmd) &#123;</span><br><span class="line">    self = ((TestClass *(*)(__rw_objc_super *, SEL))(void *)objc_msgSendSuper)((__rw_objc_super)&#123;(id)self, (id)class_getSuperclass(objc_getClass(&quot;TestClass&quot;))&#125;, sel_registerName(&quot;init&quot;));</span><br><span class="line">    if (self) &#123;</span><br><span class="line">    &#125;</span><br><span class="line">    return self;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">static void _I_TestClass_testfun_(TestClass * self, SEL _cmd, NSString *__strong string) &#123;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">void testCfun(int abc)&#123;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">[[TestClass alloc] init];</span><br><span class="line">//会转换成</span><br><span class="line"></span><br><span class="line">TestClass * test = ((TestClass *(*)(id, SEL))(void *)objc_msgSend)((id)((TestClass *(*)(id, SEL))(void *)objc_msgSend)((id)objc_getClass(&quot;TestClass&quot;), sel_registerName(&quot;alloc&quot;)), sel_registerName(&quot;init&quot;));</span><br><span class="line">/**</span><br><span class="line">*  相当于</span><br><span class="line">*  id test = objc_msgSend(objc_getClass(&quot;TestClass&quot;),sel_registerName(&quot;alloc&quot;));</span><br><span class="line">*  objc_msgSend(test, sel_registerName(&quot;init&quot;));</span><br><span class="line">*/</span><br></pre></td></tr></table></figure>
+<p><strong>Tips</strong></p>
+<p>我们可以通过下面三种方法来获取SEL:</p>
+<ol>
+<li>sel_registerName函数</li>
+<li>Objective-C编译器提供的@selector()</li>
+<li>NSSelectorFromString()方法</li>
+</ol>
+<blockquote>
+<p>得到结论：oc 经过转换后，每个oc 的方法都会带有target，SEL，和参数。<br>方法 调动的时候 会携带 target 和方法参数等。target 就是<code>self</code>，方法名就是<code>_cmd</code><br>由于C方法没有携带target，所以无法使用类的全局变量</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">@implementation TestClass</span><br><span class="line">- (instancetype)init</span><br><span class="line">&#123;</span><br><span class="line">    self = [super init];</span><br><span class="line">    if (self) &#123;</span><br><span class="line">    &#125;</span><br><span class="line">    return self;</span><br><span class="line">&#125;</span><br><span class="line">- (void)testfun:(NSString *)string&#123;</span><br><span class="line">    printf(&quot;%s\n&quot;, [[[self class] description] UTF8String]);</span><br><span class="line">    printf(&quot;%s\n&quot; ,[[[super class] description] UTF8String]);</span><br><span class="line">    printf(&quot;%s\n&quot; ,[[[self superclass] description]UTF8String]);</span><br><span class="line">    printf(&quot;%s\n&quot; ,[[[TestClass superclass] description]UTF8String]);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">@end</span><br><span class="line"></span><br><span class="line">//打印结果</span><br><span class="line">TestClass</span><br><span class="line">TestClass</span><br><span class="line">NSObject</span><br><span class="line">NSObject</span><br></pre></td></tr></table></figure>
+<p>执行的源码</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">Class a1 = ((Class (*)(id, SEL))(void *)objc_msgSend)((id)self, sel_registerName(&quot;class&quot;));</span><br><span class="line"></span><br><span class="line">Class a2 = ((Class (*)(__rw_objc_super *, SEL))(void *)objc_msgSendSuper)((__rw_objc_super)&#123;(id)self, (id)class_getSuperclass(objc_getClass(&quot;TestClass&quot;))&#125;, sel_registerName(&quot;class&quot;));</span><br><span class="line">    </span><br><span class="line">Class a3 = ((Class (*)(id, SEL))(void *)objc_msgSend)((id)self, sel_registerName(&quot;superclass&quot;));</span><br><span class="line">    </span><br><span class="line">Class a4 = ((Class (*)(id, SEL))(void *)objc_msgSend)((id)objc_getClass(&quot;TestClass&quot;), sel_registerName(&quot;superclass&quot;));</span><br></pre></td></tr></table></figure>
+<p><strong>第二行为什么不是NSObject</strong></p>
+<p><strong><code>objc_msgSendSuper</code></strong></p>
+<p><code>id objc_msgSendSuper(struct objc_super *super, SEL op, …)</code></p>
+<ul>
+<li>super 获取是传入实例和父类的class。生成的结构体如下</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">struct objc_super &#123; </span><br><span class="line">   id receiver; </span><br><span class="line">   Class superClass; </span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>SEL 要执行的方法</li>
+</ul>
+<p>比如第二次获取。要执行<code>SEL</code></p>
+<blockquote>
+<p><code>objc_msgSendSuper</code> 执行 <code>class</code> 方法。是从 <code>objc_super-&gt;superClass</code> 的方法列表开始找<code>SEL</code>，然后 objc_super-&gt; receiver 来执行这个方法。<br>由此可知 <code>super</code> 不管执行什么<code>objc_super-&gt;superClass</code> 都是 <code>self</code><br>但是 <code>objc_super</code> 在执行方法过程中 <code>superClass</code> 搜索方法列表是从 <code>objc_super-&gt;superClass</code> 开始的。<br>比如 <code>self</code> <code>super</code> 都包含 <code>- (void)testfun:(NSString *)string</code>。方法直接执行父类的方法</p>
+</blockquote>
+<p><strong>结论:super实际作用就是self 来执行父类的方法。如果父类没有，子类有相应的方法，程序直接回报错</strong></p>
+<h4 id="方法执行（消息发送流程）"><a href="#方法执行（消息发送流程）" class="headerlink" title="方法执行（消息发送流程）"></a>方法执行（消息发送流程）</h4><p>当对象创建的时候，完成初始化的时候，对象的第一个变量的指针<code>*isa</code>,<code>*isa</code>可以访问类的对象，并且可以通过对象来访问既继承链中的类。</p>
+<p>当执行方法过程中，消息随着对象的<code>*isa</code>指针到类的结构体中，在method list 查找方法，找不到就沿着继承一直上找，知道NSObject。</p>
+<p><code>objc_msgsend</code> 发送消息过程中，同一个方法第一次是没有缓存的，使用后就会缓存。之后直接调用缓存。</p>
+<p>查找方法首先从缓存里面查找。不会立即查看<code>methodLists</code>,优先查找缓存。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">struct objc_class &#123;</span><br><span class="line">    Class _Nonnull isa  ;</span><br><span class="line">    Class _Nullable super_class;</span><br><span class="line">    const char * _Nonnull name;</span><br><span class="line">    long version;</span><br><span class="line">    long info;</span><br><span class="line">    long instance_size;</span><br><span class="line">    struct objc_ivar_list * _Nullable ivars;</span><br><span class="line">    struct objc_method_list * _Nullable * _Nullable methodLists;</span><br><span class="line">    struct objc_cache * _Nonnull cache;</span><br><span class="line">    struct objc_protocol_list * _Nullable protocols;</span><br><span class="line">&#125; OBJC2_UNAVAILABLE;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">struct objc_cache &#123;</span><br><span class="line">    unsigned int mask /* total = mask + 1 */                 OBJC2_UNAVAILABLE;</span><br><span class="line">    unsigned int occupied                                    OBJC2_UNAVAILABLE;</span><br><span class="line">    Method _Nullable buckets[1]                              OBJC2_UNAVAILABLE;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">typedef struct method_t *Method;</span><br><span class="line"></span><br><span class="line">struct method_t &#123;</span><br><span class="line">    SEL name;</span><br><span class="line">    const char *types;</span><br><span class="line">    IMP imp;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p><strong><code>objc_msgSend_c</code> 执行前判断</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">id objc_msgSend_c(id obj, SEL sel,...) &#123;</span><br><span class="line">    id localObj = obj;</span><br><span class="line">    int64_t obj_i = (int64_t)obj;</span><br><span class="line">    //这一部分处理tagged pointer的isa指针</span><br><span class="line">    if (obj_i == 0) return nil;</span><br><span class="line">    if (obj_i &lt; 0) &#123;</span><br><span class="line">        //tagged pointer</span><br><span class="line">        uintptr_t obj_ui = (uintptr_t)obj_i;</span><br><span class="line">        if (obj_ui &gt;= _OBJC_TAG_EXT_MASK) &#123;</span><br><span class="line">            uint16_t index = (obj_ui &lt;&lt; _OBJC_TAG_PAYLOAD_LSHIFT) &gt;&gt; (_OBJC_TAG_EXT_INDEX_SHIFT + _OBJC_TAG_PAYLOAD_LSHIFT);</span><br><span class="line">            localObj = objc_tag_ext_classes[index];</span><br><span class="line">        &#125; else &#123;</span><br><span class="line">            uint16_t index = obj_ui &gt;&gt; _OBJC_TAG_INDEX_SHIFT;</span><br><span class="line">            localObj = objc_tag_classes[index];</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong><code>lookUpImpOrForward</code> 负责查找<code>IMP</code>和转发代码</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br></pre></td><td class="code"><pre><span class="line">IMP lookUpImpOrForward(Class cls, SEL sel, id inst, </span><br><span class="line">                       bool initialize, bool cache, bool resolver)</span><br><span class="line">&#123;</span><br><span class="line">    IMP imp = nil;</span><br><span class="line">    bool triedResolver = NO;</span><br><span class="line"></span><br><span class="line">    runtimeLock.assertUnlocked();</span><br><span class="line"></span><br><span class="line">    //  缓存中加载IMP，</span><br><span class="line">    if (cache) &#123;</span><br><span class="line">        imp = cache_getImp(cls, sel);</span><br><span class="line">        if (imp) return imp;</span><br><span class="line">    &#125;</span><br><span class="line">    runtimeLock.read();</span><br><span class="line">    //判断类是否被创建，如果没有被创建，实例化</span><br><span class="line">    if (!cls-&gt;isRealized()) &#123;</span><br><span class="line">        runtimeLock.unlockRead();</span><br><span class="line">        runtimeLock.write();</span><br><span class="line">        realizeClass(cls);</span><br><span class="line">        runtimeLock.unlockWrite();</span><br><span class="line">        runtimeLock.read();</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    if (initialize  &amp;&amp;  !cls-&gt;isInitialized()) &#123;</span><br><span class="line">        runtimeLock.unlockRead();</span><br><span class="line">        _class_initialize (_class_getNonMetaClass(cls, inst));</span><br><span class="line">        runtimeLock.read();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"> retry:    </span><br><span class="line">    runtimeLock.assertReading();</span><br><span class="line">    // Try this class&apos;s cache.尝试获取这个类的缓存</span><br><span class="line">    imp = cache_getImp(cls, sel);</span><br><span class="line">    if (imp) goto done;</span><br><span class="line"></span><br><span class="line">    // TrP this class&apos;s method lists.没有获取到缓存</span><br><span class="line">    &#123;</span><br><span class="line">        //方法列表中获取对应的Method，加入缓存获取IMP</span><br><span class="line">        Method meth = getMethodNoSuper_nolock(cls, sel);</span><br><span class="line">        if (meth) &#123;</span><br><span class="line">            log_and_fill_cache(cls, meth-&gt;imp, sel, inst, cls);</span><br><span class="line">            imp = meth-&gt;imp;</span><br><span class="line">            goto done;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    // Try superclass caches and method lists.尝试父类缓存和方法列表中获取</span><br><span class="line">    &#123;</span><br><span class="line">        unsigned attempts = unreasonableClassCount();</span><br><span class="line">        for (Class curClass = cls-&gt;superclass;</span><br><span class="line">             curClass != nil;</span><br><span class="line">             curClass = curClass-&gt;superclass)</span><br><span class="line">        &#123;</span><br><span class="line">            // Halt if there is a cycle in the superclass chain.</span><br><span class="line">            if (--attempts == 0) &#123;</span><br><span class="line">                _objc_fatal(&quot;Memory corruption in class list.&quot;);</span><br><span class="line">            &#125;</span><br><span class="line">            </span><br><span class="line">            // Superclass cache.</span><br><span class="line">            imp = cache_getImp(curClass, sel);</span><br><span class="line">            if (imp) &#123;</span><br><span class="line">                if (imp != (IMP)_objc_msgForward_impcache) &#123;</span><br><span class="line">                    // Found the method in a superclass. Cache it in this class.</span><br><span class="line">                    log_and_fill_cache(cls, imp, sel, inst, curClass);</span><br><span class="line">                    goto done;</span><br><span class="line">                &#125;</span><br><span class="line">                else &#123;</span><br><span class="line">                    // Found a forward:: entry in a superclass.</span><br><span class="line">                    // Stop searching, but don&apos;t cache yet; call method </span><br><span class="line">                    // resolver for this class first.</span><br><span class="line">                    break;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            </span><br><span class="line">            // Superclass method list.</span><br><span class="line">            Method meth = getMethodNoSuper_nolock(curClass, sel);</span><br><span class="line">            if (meth) &#123;</span><br><span class="line">                log_and_fill_cache(cls, meth-&gt;imp, sel, inst, curClass);</span><br><span class="line">                imp = meth-&gt;imp;</span><br><span class="line">                goto done;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    // No implementation found. Try method resolver once.</span><br><span class="line">    // 消息转发模式，没有查到可执行的IMP，尝试动态解析</span><br><span class="line">    if (resolver  &amp;&amp;  !triedResolver) &#123;</span><br><span class="line">        runtimeLock.unlockRead();</span><br><span class="line">        _class_resolveMethod(cls, sel, inst);</span><br><span class="line">        runtimeLock.read();</span><br><span class="line">        // Don&apos;t cache the result; we don&apos;t hold the lock so it may have </span><br><span class="line">        // changed already. Re-do the search from scratch instead.</span><br><span class="line">        triedResolver = YES;</span><br><span class="line">        goto retry;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    // No implementation found, and method resolver didn&apos;t help. </span><br><span class="line">    // Use forwarding.</span><br><span class="line">    // 如果IMP没有找到，动态解析也没有处理，进入消息转发阶段</span><br><span class="line">    imp = (IMP)_objc_msgForward_impcache;</span><br><span class="line">    cache_fill(cls, sel, imp, inst);</span><br><span class="line"></span><br><span class="line"> done:</span><br><span class="line">    runtimeLock.unlockRead();</span><br><span class="line">    return imp;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>_class_resolveMethod</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">/***********************************************************************</span><br><span class="line">* _class_resolveMethod</span><br><span class="line">* Call +resolveClassMethod or +resolveInstanceMethod.</span><br><span class="line">* Returns nothing; any result would be potentially out-of-date already.</span><br><span class="line">* Does not check if the method already exists.</span><br><span class="line">**********************************************************************/</span><br><span class="line">void _class_resolveMethod(Class cls, SEL sel, id inst)</span><br><span class="line">&#123;</span><br><span class="line">    if (! cls-&gt;isMetaClass()) &#123;</span><br><span class="line">        // try [cls resolveInstanceMethod:sel]</span><br><span class="line">        _class_resolveInstanceMethod(cls, sel, inst);</span><br><span class="line">    &#125; </span><br><span class="line">    else &#123;</span><br><span class="line">        // try [nonMetaClass resolveClassMethod:sel]</span><br><span class="line">        // and [cls resolveInstanceMethod:sel]</span><br><span class="line">        _class_resolveClassMethod(cls, sel, inst);</span><br><span class="line">        if (!lookUpImpOrNil(cls, sel, inst, </span><br><span class="line">                            NO/*initialize*/, YES/*cache*/, NO/*resolver*/)) </span><br><span class="line">        &#123;</span><br><span class="line">            _class_resolveInstanceMethod(cls, sel, inst);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p><strong>_class_resolveInstanceMethod</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line">static void _class_resolveInstanceMethod(Class cls, SEL sel, id inst)</span><br><span class="line">&#123;</span><br><span class="line">    if (! lookUpImpOrNil(cls-&gt;ISA(), SEL_resolveInstanceMethod, cls, </span><br><span class="line">                         NO/*initialize*/, YES/*cache*/, NO/*resolver*/)) </span><br><span class="line">    &#123;</span><br><span class="line">        // Resolver not implemented.</span><br><span class="line">        return;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    BOOL (*msg)(Class, SEL, SEL) = (typeof(msg))objc_msgSend;</span><br><span class="line">    bool resolved = msg(cls, SEL_resolveInstanceMethod, sel);</span><br><span class="line"></span><br><span class="line">    // Cache the result (good or bad) so the resolver doesn&apos;t fire next time.</span><br><span class="line">    // +resolveInstanceMethod adds to self a.k.a. cls</span><br><span class="line">    IMP imp = lookUpImpOrNil(cls, sel, inst, </span><br><span class="line">                             NO/*initialize*/, YES/*cache*/, NO/*resolver*/);</span><br><span class="line"></span><br><span class="line">    if (resolved  &amp;&amp;  PrintResolving) &#123;</span><br><span class="line">        if (imp) &#123;</span><br><span class="line">            _objc_inform(&quot;RESOLVE: method %c[%s %s] &quot;</span><br><span class="line">                         &quot;dynamically resolved to %p&quot;, </span><br><span class="line">                         cls-&gt;isMetaClass() ? &apos;+&apos; : &apos;-&apos;, </span><br><span class="line">                         cls-&gt;nameForLogging(), sel_getName(sel), imp);</span><br><span class="line">        &#125;</span><br><span class="line">        else &#123;</span><br><span class="line">            // Method resolver didn&apos;t add anything?</span><br><span class="line">            _objc_inform(&quot;RESOLVE: +[%s resolveInstanceMethod:%s] returned YES&quot;</span><br><span class="line">                         &quot;, but no new implementation of %c[%s %s] was found&quot;,</span><br><span class="line">                         cls-&gt;nameForLogging(), sel_getName(sel), </span><br><span class="line">                         cls-&gt;isMetaClass() ? &apos;+&apos; : &apos;-&apos;, </span><br><span class="line">                         cls-&gt;nameForLogging(), sel_getName(sel));</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">/***********************************************************************</span><br><span class="line">* lookUpImpOrNil.</span><br><span class="line">* Like lookUpImpOrForward, but returns nil instead of _objc_msgForward_impcache</span><br><span class="line">**********************************************************************/</span><br><span class="line">IMP lookUpImpOrNil(Class cls, SEL sel, id inst, </span><br><span class="line">                   bool initialize, bool cache, bool resolver)</span><br><span class="line">&#123;</span><br><span class="line">    IMP imp = lookUpImpOrForward(cls, sel, inst, initialize, cache, resolver);</span><br><span class="line">    if (imp == _objc_msgForward_impcache) return nil;</span><br><span class="line">    else return imp;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>总结:调用objc_msgSend后，逻辑判断</strong></p>
+<ol>
+<li>接收对象为<code>nil</code>,消息无效 (<code>objc_msgSend_c</code>)</li>
+<li>通过对象类的方法缓存里面查找（<code>cache_getImp</code>），如果有缓存直接返回IMP</li>
+<li>查找类的method list,查找有对应的SEL 对象，有的话获取Method 对象，获取Method 的IMP。并加入缓存。</li>
+<li>如果没有查找到，查询父类 ，重复 3，直至 <code>NSObject</code></li>
+<li>如果始终获取不到。进入动态解析。<code>_class_resolveMethod</code> ，会检测如果是类方法 <code>_class_resolveClassMethod</code>,成员方法 <code>_class_resolveInstanceMethod</code>,进入动态解析。</li>
+<li>如果IMP没有找到，动态解析也没有处理，进入消息转发阶段。如果不错处理，就会crash</li>
+</ol>
+<p><strong>下图是实际工作中的消息转发。</strong></p>
+<p><img src="https://kuiyu-1258489344.cos.ap-chengdu.myqcloud.com/ios-Runtime-%E6%80%BB%E7%BB%93/messagere.png" alt=""></p>
+<h3 id="加载过程"><a href="#加载过程" class="headerlink" title="加载过程"></a>加载过程</h3><p>IOS 动态库都是动态加载的。程序开始的时候才会链接动态库</p>
+<h4 id="APP-启动加载"><a href="#APP-启动加载" class="headerlink" title="APP 启动加载"></a>APP 启动加载</h4><ol>
+<li>系统先读取App 的可执行文件，里面获取<code>dyld</code>路径。</li>
+<li><code>dyld</code>初始化运行环境，开启缓存策略，加载相关依赖库和可执行文件，依赖库的初始化。</li>
+<li><code>dyld</code>将可执行文件以及相应的依赖库与插入库加载进内存生成对应的ImageLoader类的image(镜像文件)对象，对这些image进行链接，调用各image的初始化方法等(递归调用)</li>
+<li>等待全部初始后，<code>Runtime</code>也初始化完成，会收到调用相关的回调。</li>
+<li><code>Runtime</code>对类进行类结构初始化。让后调用<code>+load</code></li>
+<li>执行<code>main</code></li>
+</ol>
+<p><strong><code>dyld</code></strong></p>
+<p>通过Mach-O文件查看器<a href="http://sourceforge.net/projects/machoview/">MachOView</a>查看一个项目可执行文件</p>
+<p><img src="https://kuiyu-1258489344.cos.ap-chengdu.myqcloud.com/ios-Runtime-%E6%80%BB%E7%BB%93/machover.png" alt=""></p>
+<p>程序需要的dyld的路径在LC_LOAD_DY_LINKER命令里，一般都是在/usr/lib/dyld 路径下。这里的LC_MAIN指的是程序main函数加载地址，下面还有写LC_LOAD_DYLIB指向的都是程序依赖库加载信息，如果我们程序里使用到了AFNetworking，这里就会多一条名为LC_LOAD_DYLIB(AFNetworking)的命令</p>
+<p><img src="https://kuiyu-1258489344.cos.ap-chengdu.myqcloud.com/ios-Runtime-%E6%80%BB%E7%BB%93/stafdsa.png" alt=""></p>
+<p><strong><code>Runtime</code>对类进行类结构初始化</strong></p>
+<ul>
+<li><code>Runtime</code>实例化 <code>_objc_init</code> 调用</li>
+<li>调用<code>_dyld_objc_notify_register</code>开始实例化</li>
+<li>调用<code>load_images</code> 加载镜像</li>
+<li><code>load_images</code> 里面调用 <code>call_load_methods</code></li>
+<li><code>call_load_methods</code> 调用 <code>call_class_loads</code></li>
+<li>开始调用 class 和 category 的<code>+load</code>方法</li>
+<li>第一次属于类的方法调用 调用 <code>initialize</code>,如果不调用永远不会调用</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">static void schedule_class_load(Class cls)</span><br><span class="line">&#123;</span><br><span class="line">    if (!cls) return;</span><br><span class="line">    assert(cls-&gt;isRealized());  // _read_images should realize</span><br><span class="line"></span><br><span class="line">    if (cls-&gt;data()-&gt;flags &amp; RW_LOADED) return;</span><br><span class="line"></span><br><span class="line">    // Ensure superclass-first ordering</span><br><span class="line">    schedule_class_load(cls-&gt;superclass);</span><br><span class="line"></span><br><span class="line">    add_class_to_loadable_list(cls);</span><br><span class="line">    cls-&gt;setInfo(RW_LOADED); </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p><code>+load</code> 是在初始化时候调用，<code>main</code> 所有实例化后才会调用。类的方法<code>+load</code> 遍历所有的子类都加入。父类的在前。<code>category</code> 直接添加</p>
+</blockquote>
+<h3 id="Category"><a href="#Category" class="headerlink" title="Category"></a>Category</h3><blockquote>
+<p>在Category添加属性后，默认是没有实现方法的。当时编译不会错。调用会崩溃。</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">Property &apos;object&apos; requires method &apos;object&apos; to be defined - use @dynamic or provide a method implementation in this category</span><br></pre></td></tr></table></figure>
+<p>下面是保存属性的方法<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line">void _object_set_associative_reference(id object, void *key, id value, uintptr_t policy) &#123;</span><br><span class="line">    // retain the new value (if any) outside the lock.</span><br><span class="line">    ObjcAssociation old_association(0, nil);</span><br><span class="line">    id new_value = value ? acquireValue(value, policy) : nil;</span><br><span class="line">    &#123;</span><br><span class="line">        AssociationsManager manager;</span><br><span class="line">        AssociationsHashMap &amp;associations(manager.associations());</span><br><span class="line">        disguised_ptr_t disguised_object = DISGUISE(object);</span><br><span class="line">        if (new_value) &#123;</span><br><span class="line">            // break any existing association.</span><br><span class="line">            AssociationsHashMap::iterator i = associations.find(disguised_object);</span><br><span class="line">            if (i != associations.end()) &#123;</span><br><span class="line">                // secondary table exists</span><br><span class="line">                ObjectAssociationMap *refs = i-&gt;second;</span><br><span class="line">                ObjectAssociationMap::iterator j = refs-&gt;find(key);</span><br><span class="line">                if (j != refs-&gt;end()) &#123;</span><br><span class="line">                    old_association = j-&gt;second;</span><br><span class="line">                    j-&gt;second = ObjcAssociation(policy, new_value);</span><br><span class="line">                &#125; else &#123;</span><br><span class="line">                    (*refs)[key] = ObjcAssociation(policy, new_value);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125; else &#123;</span><br><span class="line">                // create the new association (first time).</span><br><span class="line">                ObjectAssociationMap *refs = new ObjectAssociationMap;</span><br><span class="line">                associations[disguised_object] = refs;</span><br><span class="line">                (*refs)[key] = ObjcAssociation(policy, new_value);</span><br><span class="line">                object-&gt;setHasAssociatedObjects();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; else &#123;</span><br><span class="line">            // setting the association to nil breaks the association.</span><br><span class="line">            AssociationsHashMap::iterator i = associations.find(disguised_object);</span><br><span class="line">            if (i !=  associations.end()) &#123;</span><br><span class="line">                ObjectAssociationMap *refs = i-&gt;second;</span><br><span class="line">                ObjectAssociationMap::iterator j = refs-&gt;find(key);</span><br><span class="line">                if (j != refs-&gt;end()) &#123;</span><br><span class="line">                    old_association = j-&gt;second;</span><br><span class="line">                    refs-&gt;erase(j);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    // release the old value (outside of the lock).</span><br><span class="line">    if (old_association.hasValue()) ReleaseValue()(old_association);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>对象都存入 <code>AssociationsHashMap</code>中</p>
+<h3 id="Runtime-应用"><a href="#Runtime-应用" class="headerlink" title="Runtime 应用"></a>Runtime 应用</h3><h4 id="指令的应用"><a href="#指令的应用" class="headerlink" title="指令的应用"></a>指令的应用</h4><ul>
+<li><code>__attribute__</code> <a href="https://clang.llvm.org/docs/AttributeReference.html">用法</a> 允许增加参数，做一些高级检查和优化</li>
+</ul>
+<ol>
+<li><p><code>objc_subclassing_restricted</code> 不能被继承</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">__attribute__((objc_subclassing_restricted)) </span><br><span class="line">@interface TestObject : NSObject</span><br><span class="line">@end</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><code>objc_requires_super</code> 子类必须实现父类的方法，否则警告</p>
+</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">- (void)testMethod __attribute__((objc_requires_super));</span><br></pre></td></tr></table></figure>
+<ol start="3">
+<li><code>constructor / destructor</code> <code>main</code>函数前后执行,<code>__attribute__((constructor(101)))</code> 添加优先级</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">__attribute__((constructor)) static void beforeMain() &#123; NSLog(@&quot;before main&quot;);</span><br><span class="line">&#125;</span><br><span class="line">__attribute__((destructor)) static void afterMain() &#123; NSLog(@&quot;after main&quot;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ol start="4">
+<li><code>overloadable</code> 可重复方法名</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">__attribute__((overloadable)) void testMethod(int age) &#123;&#125; </span><br><span class="line">__attribute__((overloadable)) void testMethod(NSString *name) &#123;&#125; </span><br><span class="line">__attribute__((overloadable)) void testMethod(BOOL gender) &#123;&#125;</span><br></pre></td></tr></table></figure>
+<ol start="5">
+<li><code>cleanup</code> 释放变量前执行</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">TestObject *object __attribute__((cleanup(releaseBefore))) = [[TestObject alloc] init];</span><br><span class="line">static void releaseBefore(NSObject **object) &#123; </span><br><span class="line">    NSLog(@&quot;%@&quot;, *object);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="ORM"><a href="#ORM" class="headerlink" title="ORM"></a>ORM</h3><p>对象的映射关系</p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/IOS/" rel="tag"># IOS</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/01/11/Objective-C/" rel="next" title="Objective C 特性">
+                <i class="fa fa-chevron-left"></i> Objective C 特性
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">智奎宇</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">16</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  <a href="/categories/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">10</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">9</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#Runtime消息传递"><span class="nav-number">1.</span> <span class="nav-text">Runtime消息传递</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#方法调用"><span class="nav-number">1.1.</span> <span class="nav-text">方法调用</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#隐藏参数"><span class="nav-number">1.2.</span> <span class="nav-text">隐藏参数</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#方法执行（消息发送流程）"><span class="nav-number">1.3.</span> <span class="nav-text">方法执行（消息发送流程）</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#加载过程"><span class="nav-number">2.</span> <span class="nav-text">加载过程</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#APP-启动加载"><span class="nav-number">2.1.</span> <span class="nav-text">APP 启动加载</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Category"><span class="nav-number">3.</span> <span class="nav-text">Category</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Runtime-应用"><span class="nav-number">4.</span> <span class="nav-text">Runtime 应用</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#指令的应用"><span class="nav-number">4.1.</span> <span class="nav-text">指令的应用</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ORM"><span class="nav-number">5.</span> <span class="nav-text">ORM</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">智奎宇</span>
+
+  
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v3.8.0</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> v6.7.0</div>
+
+
+
+
+
+  <script src="https://unpkg.com/mermaid@<%= theme.mermaid.version %>/dist/mermaid.min.js"></script>
+  <script>
+    if (window.mermaid) {
+      mermaid.initialize({theme: 'forest'});
+    }
+  </script>
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+    
+    
+  
+  <script color="0,0,255" opacity="0.5" zindex="-1" count="99" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/src/utils.js?v=6.7.0"></script>
+
+  <script src="/js/src/motion.js?v=6.7.0"></script>
+
+
+
+  
+  
+
+  
+  <script src="/js/src/scrollspy.js?v=6.7.0"></script>
+<script src="/js/src/post-details.js?v=6.7.0"></script>
+
+
+
+  
+
+
+  <script src="/js/src/bootstrap.js?v=6.7.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script>
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url).replace(/\/{2,}/g, '/');
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x"></i></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x"></i></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
